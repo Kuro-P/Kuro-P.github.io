@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>《计算机网络》- http 部分读书笔记</title>
+      <link href="/2019/10/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B-http-%E9%83%A8%E5%88%86%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+      <url>/2019/10/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E3%80%8B-http-%E9%83%A8%E5%88%86%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[<p>《计算机网络(第7版)-谢希仁》http 部分的读书小结和扩展，因为工作中最常打交道的就是这部分了。整本书都很不错，语言通俗易懂；各协议的关系、发展过程以及区别都概括的很好。<br>本文主要概括 HTTP、HTTP1.0、HTTP2.0、HTTPS 的之间的差异。<br><a id="more"></a></p><h3 id="万维网WWW"><a href="#万维网WWW" class="headerlink" title="万维网WWW"></a>万维网WWW</h3><p>万维网(World Wide Web)是一个分布式的超媒体系统，是超文本系统的扩充。万维网使用 <strong>统一资源定位符URL(Uniform Resource Locator)</strong> 来标志万维网上的各种文档。</p><h4 id="URL-的格式"><a href="#URL-的格式" class="headerlink" title="URL 的格式"></a>URL 的格式</h4><p>URL 的一般形式由以下四个部分组成：<br>&nbsp;&nbsp;&nbsp;&nbsp; <code>&lt;协议&gt;://&lt;主机&gt;:&lt;端口&gt;/&lt;路径&gt;</code><br>URL 的&lt;协议&gt;就是指出使用什么协议来获取万维网文档。现在最常用的协议就是 http，其次是 ftp。有些浏览器为方便用户，在输入 URL 时，可以把最前面的“http://”甚至把主机名最前面的“www”省略，然后浏览器替用户把省略的字补上。<br><strong>URL里面的字母不分大小写，但是为了便于阅读，有时故意使用一些大写字母。</strong></p><h4 id="超文本传送协议-HTTP"><a href="#超文本传送协议-HTTP" class="headerlink" title="超文本传送协议 HTTP"></a>超文本传送协议 HTTP</h4><p>HTTP(HyperText Transfer Protocol，超文本传输协议)，使用了面向连接的 TCP 作为传输层协议，监听 80 端口，信息是明文传输，其本身是无状态的。</p><ul><li>HTTP1.0 :(1996) 每次请求都会单独建立一个TCP连接，用完关闭；（缺点：每次请求都耗费时间在连接上，<strong>非持续连接</strong> 使服务器开销很重）。</li><li>HTTP1.1 :(1999) 在服务器发送完响应后仍在一段时间内保持这条连接，浏览器和该服务器可以继续在该连接上传送后续的请求报文和响应报文，使用 <strong>持续连接</strong> 。</li><li>HTTP2.0 :(2015) 使用了新的二进制格式、多路复用、以及header压缩，性能相对于 HTTP1.x 提升明显。</li></ul><h4 id="影响-HTTP-网络请求的因素"><a href="#影响-HTTP-网络请求的因素" class="headerlink" title="影响 HTTP 网络请求的因素"></a>影响 HTTP 网络请求的因素</h4><p>影响因素主要有两个：带宽和延迟。</p><ul><li><strong>带宽</strong>：在浏览器刚流行的时候，大部分用户是通过拨号来上网，由于受当时的带宽条件的限制，无法使得用户的同时多个请求被处理。同时，当时的服务器的配置也比现在差很多，所以限制每个浏览器的连接数的大小也是有必要的。浏览器默认对同一域下的资源，只保持一定的连接数，阻塞过多的连接,以提高访问速度和解决阻塞问题。不同浏览器的默认值不一样，对于不同的 HTTP 协议其值也不一样。</li></ul><table><thead><tr><th style="text-align:center">浏览器</th><th style="text-align:center">HTTP 1.1</th><th style="text-align:center">HTTP 1.0</th></tr></thead><tbody><tr><td style="text-align:center">IE 6、7</td><td style="text-align:center">2</td><td style="text-align:center">4</td></tr><tr><td style="text-align:center">IE 8</td><td style="text-align:center">6</td><td style="text-align:center">6</td></tr><tr><td style="text-align:center">FireFox 2</td><td style="text-align:center">2</td><td style="text-align:center">8</td></tr><tr><td style="text-align:center">FireFox 3</td><td style="text-align:center">6</td><td style="text-align:center">6</td></tr><tr><td style="text-align:center">Safari 3、4</td><td style="text-align:center">4</td><td style="text-align:center">4</td></tr></tbody></table><p>如果说我们还停留在拨号上网的阶段，带宽可能会成为一个比较严重影响请求的问题，但是现在网络基础建设已经使得带宽得到极大的提升，我们不再会担心由带宽而影响网速，那么就只剩下延迟了。</p><ul><li><strong>延迟</strong>：<ul><li>浏览器阻塞（HOL blocking）：浏览器会因为一些原因阻塞请求。浏览器对于同一个域名，同时只能有 4 个连接（这个根据浏览器内核不同可能会有所差异），超过浏览器最大连接数限制（见上表），后续请求就会被阻塞。</li><li>DNS 查询（DNS Lookup）：浏览器需要知道目标服务器的 IP 才能建立连接。将域名解析为 IP 的这个系统就是 DNS。这个通常可以利用DNS缓存结果来达到减少这个时间的目的。</li><li>建立连接（Initial connection）：HTTP 是基于 TCP 协议的，浏览器最快也要在第三次握手时才能捎带 HTTP 请求报文，达到真正的建立连接，但是这些连接无法复用会导致每次请求都经历三次握手和慢启动。三次握手在高延迟的场景下影响较明显，慢启动则对文件类大请求影响较大。</li></ul></li></ul><h4 id="应用层安全协议-HTTPS"><a href="#应用层安全协议-HTTPS" class="headerlink" title="应用层安全协议 HTTPS"></a>应用层安全协议 HTTPS</h4><p>HTTPS 是使用 SSL(Secure Socket Layer，安全套接字层)协议的 HTTP 协议。SSL 作用在 HTTP 和运输层之间，在 TCP 之上建立起一个安全通道，为通过 TCP 传输的应用层数据提供安全保障。<br>HTTPS 监听 TCP 的 443 端口，信息是密文传输。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机相关知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>z-index小结</title>
+      <link href="/2019/08/05/z-index%E5%B0%8F%E7%BB%93/"/>
+      <url>/2019/08/05/z-index%E5%B0%8F%E7%BB%93/</url>
+      
+        <content type="html"><![CDATA[<p>z-index 这东西简单的用法大家都会用，但是当多个规则多个层级共同作用时，展现的效果往往跟自己的想法有很大差异，论 CSS 基本功的重要性。本文总结了 CSS 层叠的特性、基本准则和创建条件，内容大多参考了张鑫旭大神的《CSS世界》。<br><a id="more"></a></p><h3 id="层叠的基本概念"><a href="#层叠的基本概念" class="headerlink" title="层叠的基本概念"></a>层叠的基本概念</h3><ul><li>层叠上下文(stacking context)：当前元素所处的层叠规则，即元素所处的 z 轴。一个页面中，层叠上下文不止一个。</li><li>层叠水平(stacking level)：同一个层叠上下文中元 素在 z 轴上的显示等级。</li><li>层叠顺序(stacking order)：<ul><li>background/border 指在同一层叠上下文元素的边框和背景色。</li><li>inline水平盒子指的是包括inline/inline-block/inline-table元素的“层叠顺序”，它们都是同等级别的。</li><li>内联元素的层叠顺序要比浮动元素和块状元素都高，是因为float元素在起始时是作为布局元素存在的。由于“内容”的重要性远大于“装饰”和“布局”，所以内容元素层叠顺序比较高，详情见下图：<br><img src="/2019/08/05/z-index小结/stacking-order.png" alt="层叠顺序图"></li></ul></li></ul><h3 id="z-index"><a href="#z-index" class="headerlink" title="z-index"></a>z-index</h3><p><strong>z-index 属性只有和定位元素(position 不为 static 的元素)在一起的时候才有作用，可以是正数也可以是负数。在同一层叠上下文中，数值越大层级越高。</strong> 在CSS3中，z-index 已经并非只对定位元素有效，flex 盒子的子元素 也可以设置 z-index 属性。</p><h4 id="层叠准则"><a href="#层叠准则" class="headerlink" title="层叠准则"></a>层叠准则</h4><ol><li>谁大谁上：在同一个层叠上下文领域，具有明显的层叠水平标识的时候，层叠水平值大的那一个覆盖小的那一个，例如 z-index 属性值。</li><li>后来居上：当元素的层叠水平一致、层叠顺序相同的时候，在 DOM 流中处于后面的元素会覆盖前面的元素。</li></ol><h4 id="层叠上下文的特性"><a href="#层叠上下文的特性" class="headerlink" title="层叠上下文的特性"></a>层叠上下文的特性</h4><ul><li>层叠上下文的层叠水平要比普通元素高。</li><li>层叠上下文可以阻断元素的混合模式。</li><li>层叠上下文可以嵌套，内部层叠上下文及其所有子元素均受制于外部的“层叠上下文”。</li><li>每个层叠上下文和兄弟元素独立，也就是说，当进行层叠变化或渲染的时候，只需要考虑后代元素。</li><li>每个层叠上下文是自成体系的，当元素发生层叠的时候，整个元素被认为是在父层叠上下文的层叠顺序中。</li></ul><h4 id="页面中的层叠上下文"><a href="#页面中的层叠上下文" class="headerlink" title="页面中的层叠上下文"></a>页面中的层叠上下文</h4><ul><li><strong>根层叠上下文</strong>：页面根元素具有层叠上下文，称为“根层叠上下文”。故页面中所有的元素至少处于一个层叠上下文中。</li><li><strong>定位元素与传统层叠上下文</strong>：对于 position 值为 relative/absolute 以及 Firefox/IE 浏览器(不包括 Chrome 浏览 器)下含有 position:fixed 声明的定位元素，当其 z-index 值不是 auto 的时候，会创建层叠上下文(<strong>z-index 一旦变成数值，即使是 0，也创建一个层叠上下文</strong>)。</li><li><strong>CSS3新属性的层叠上下文</strong>：<ul><li>元素为 flex 布局元素(父元素 display:flex|inline-flex)，同时 z-index 值不是 auto。</li><li>元素的 opacity 值不是 1</li><li>元素的 transform 值不是 none。</li><li>元素 mix-blend-mode 值不是 normal。</li><li>元素的 filter 值不是 none。</li><li>元素的 isolation 值是 isolate。</li><li>元素的 will-change 属性值为上面 2~6 的任意一个(如 will-change:opacity、will-chang:transform 等)。</li><li>元素的-webkit-overflow-scrolling 设为 touch。</li></ul></li></ul><h4 id="CSS3-属性与-z-index-的兼容性问题"><a href="#CSS3-属性与-z-index-的兼容性问题" class="headerlink" title="CSS3 属性与 z-index 的兼容性问题"></a>CSS3 属性与 z-index 的兼容性问题</h4><ol><li>Safari 3D变换会忽略 z-index<a href="https://blog.csdn.net/sherry_0706/article/details/52593888" target="_blank" rel="noopener">(解决方案)</a></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 前端 </category>
+          
+          <category> CSS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CSS </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Prometheus 监控应用性能</title>
+      <link href="/2019/07/15/Prometheus%E7%9B%91%E6%8E%A7%E5%BA%94%E7%94%A8%E6%80%A7%E8%83%BD/"/>
+      <url>/2019/07/15/Prometheus%E7%9B%91%E6%8E%A7%E5%BA%94%E7%94%A8%E6%80%A7%E8%83%BD/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。<br><a id="more"></a></p><h3 id="一、Prometheus-系统简介"><a href="#一、Prometheus-系统简介" class="headerlink" title="一、Prometheus 系统简介"></a>一、Prometheus 系统简介</h3><p><a href="https://prometheus.io/" target="_blank" rel="noopener">Prometheus</a> 是一个开源的服务监控系统，社区资源和开发者都很活跃。其主要原理是通过 HTTP 协议从远程的机器收集数据并存储在本地的<a href="https://www.cnblogs.com/aiandbigdata/p/10052335.html" target="_blank" rel="noopener">时序数据库</a>上。Prometheus 通过安装在远程机器上的 exporter (数据暴露)插件来收集监控数据。</p><h4 id="Prometheus-特点"><a href="#Prometheus-特点" class="headerlink" title="Prometheus 特点"></a>Prometheus 特点</h4><p>Prometheus 本身也是一个时序数据库，它通过 HTTP 的方式获取时序数据。Prometheus 自身的查询语言 PromQL 可多维度的查询并实时计算指标的值。通过 PromQL 提供的计算方法，可以自定义数据可视化的指标，以及报警临界值。它有四种数据类型，可针对不同场景使用不同数据类型。</p><h4 id="Prometheus-系统的组成部分"><a href="#Prometheus-系统的组成部分" class="headerlink" title="Prometheus 系统的组成部分"></a>Prometheus 系统的组成部分</h4><p><img src="/2019/07/15/Prometheus监控应用性能/architecture.png" alt="" title="Prometheus 架构"><br>在监控流程中，主要由三个部分组成：被监控的应用暴露性能指标(exporter)，promethues 应用采集性能指标(collector)，数据可视化分析界面(web UI)。详情参照下述：</p><ol><li>Prometheus server: 用于抓取数据，并存储到时序数据库;</li><li>Prometheus exporter: 安装在监控目标的上，为 Prometheus server 提供数据抓取的接口;</li><li>Prometheus web UI: 提供数据可视化分析界面;</li><li>Alertmanager: 用于处理警报;</li><li>Pushgateway: 用于 job 推送;</li></ol><h3 id="二、Prometheus-监控流程图"><a href="#二、Prometheus-监控流程图" class="headerlink" title="二、Prometheus 监控流程图"></a>二、Prometheus 监控流程图</h3><p><img src="/2019/07/15/Prometheus监控应用性能/flowChart.png" alt="" title="Prometheus flow chart"></p><h4 id="Promethues-server"><a href="#Promethues-server" class="headerlink" title="Promethues server"></a>Promethues server</h4><p>主要负责数据采集和存储，提供 PromQL 查询语言的支持。可以通过 Prometheus 的 <code>.yml</code>文件中的<code>scrape_config</code> <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config" target="_blank" rel="noopener">(字段详情)</a>来配置要抓取的应用指标地址。同时，Promethues 也会监控自身的健康情况，默认将指标暴露在自身的 <code>http://localhost:9090/metrics</code>。</p><h4 id="Promethues-exporter"><a href="#Promethues-exporter" class="headerlink" title="Promethues exporter"></a>Promethues exporter</h4><p>参照<a href="https://prometheus.io/docs/instrumenting/clientlibs/" target="_blank" rel="noopener">官方推荐的插件列表</a>，由于本次监听的站点是 NodeJS 站点，所以选择 <a href="https://github.com/siimon/prom-client" target="_blank" rel="noopener">prom-client</a> 作为 exporter。<br>注意：被监听的应用需要暴露指标接口供 server 抓取。</p><h4 id="Prometheus-web-UI"><a href="#Prometheus-web-UI" class="headerlink" title="Prometheus web UI"></a>Prometheus web UI</h4><p>Grafana 可以连接多种类型的库，选择 Promethues 即可，默认监听 Promethues server 的9090<code>/metrics</code> 路径。</p><h3 id="三、NodeJS-应用性能监控"><a href="#三、NodeJS-应用性能监控" class="headerlink" title="三、NodeJS 应用性能监控"></a>三、NodeJS 应用性能监控</h3><p>使用 <a href="https://github.com/siimon/prom-client" target="_blank" rel="noopener">prom-client</a> 和 <a href="https://github.com/SimenB/node-prometheus-gc-stats" target="_blank" rel="noopener">node-prometheus-gc-stats</a> 收集 NodeJS 的性能指标。</p><ul><li>prom-client：收集服务端性能指标</li><li>node-prometheus-gc-stats：垃圾回收相关指标统计</li></ul><p>（prom-client 相当于一个exporter，将默认的指标暴露在 /metrics 接口，之后 Promethues service会根据 <code>.yml</code> 配置中的采集时间定期来这个接口采集数据信息，然后 web UI Grafana 再跟 Promethues server 进行同步）</p><h4 id="prom-client-文档"><a href="#prom-client-文档" class="headerlink" title="prom-client 文档"></a>prom-client 文档</h4><p>一共支持四种数据格式：Histogram、Summary、Gauges 、Counters：</p><ul><li><strong>Histogram(柱状图)</strong>：统计数据的分布情况（比如 <code>Http_response_time</code> 的时间分布）</li><li><strong>Summary(摘要)</strong>：主要用于表示一段时间内数据采样结果（请求持续的时间或响应大小）</li><li><strong>Gauges(仪表盘)</strong>：最简单的度量指标，监测瞬间状态（监控硬盘容量或者内存的使用量）</li><li><strong>Counters(计数器)</strong>：从数据量0开始累积计算，在理想状态下只能是永远的增长不会降低</li></ul><p>常用的采集方法：</p><ul><li>collectDefaultMetrics() 返回 Promethues 的默认推荐指标，默认10s探测一次</li><li>AggregatorRegsitry 聚合注册器：监听集群的性能指标（主进程和其产生的子进程）<ul><li>clusterMetrics() 返回默认指标</li><li><a href="https://github.com/siimon/prom-client/issues/257" target="_blank" rel="noopener">抓取所有进程的 metrics 只能在主进程上抓取，在子进程上获取不到 metrics</a></li></ul></li></ul><p>收集到指标后，就可以利用 PromQL 进行计算了，计算时注意 PromQL <strong>即时向量</strong> 和 <strong>范围向量</strong> 两种向量的区别和转换：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 计算每分钟垃圾回收bytes数</span><br><span class="line">delta(nodejs_gc_reclaimed_bytes_total&#123;gctype=&quot;Scavenge&quot;&#125;[1m])</span><br><span class="line"></span><br><span class="line">// 计算个页面5min以内的DomReady均值</span><br><span class="line">delta(FE_Timing_Performance_domReady_sum[5m])/delta(FE_Timing_Performance_domReady_count[5m])</span><br></pre></td></tr></table></figure></p><h4 id="※example-prometheus-nodejs"><a href="#※example-prometheus-nodejs" class="headerlink" title="※example-prometheus-nodejs"></a>※<a href="https://github.com/RisingStack/example-prometheus-nodejs" target="_blank" rel="noopener">example-prometheus-nodejs</a></h4><p>&emsp;&emsp; 这个 demo 是一个完整的 prom-client + Promethues + grafana 监控示例，有助于理解整个监控流程。</p><h3 id="四、前端异常记录实践结论"><a href="#四、前端异常记录实践结论" class="headerlink" title="四、前端异常记录实践结论"></a>四、前端异常记录实践结论</h3><p><strong>并不推荐使用 Prometheus 系统来记录前端页面性能等信息。</strong></p><ol><li>从指标上来看，应用的基本性能指标：吞吐量、内存使用量、每秒请求数、请求平均耗时等。这些几乎都是“瞬时”值（由于时间窗口小，可看做瞬时值），而前端性能指标并不是“瞬时”，它更偏向于一段时间内的表现情况（时间窗口大）。Prometheus 系统主要用于监听应用的性能，它的数据类型更多是为应用服务。</li></ol><ul><li>应用性能特点：一个应用，多个指标；</li><li><a href="https://kuro-p.github.io/2019/07/11/前端性能监控-Performance/#more" target="_blank" rel="noopener">前端页面的性能指标</a>特点：一个页面，多个指标。多个页面。</li></ul><ol start="2"><li>从数据类型上来看：<ul><li>Gauges：不可以用来记录前端的性能表现。因为 Gauge 记录的某一刻的瞬时值，如果用来记录时间，则每次数据都会被最后访问的那名用户刷新；</li><li>Counter：计数器虽然可以记录前端某个页面的访问次数，但若页面路由中携带参数，或者结尾带时间戳，则会生成多个重复页面的 Counter，遇到爬虫还会生成大量无用路径，表现并不好；</li><li>Histogram、Summary：可以记录多个页面，多个指标；Histogram 和 Summary 很相似，只不过 Histogram 记录原始值，Summary 记录指标的各个占比。</li></ul></li><li>从可视化web UI上来看：<br>公司 Prometheus 系统默认使用的可视化UI是 Grafana。之前尝试用 Histogram 来记录前端各页面的性能表现，在 Grafana 中用折线图可视化数据。一个指标对应一个折线图，但由于页面路由多个，导致各个折线图中折线过多难以分辨；若取所有页面该指标的均值或者最大值来展示，又不知道峰值是哪个页面产生的。</li></ol><p><strong>综上可以看出，Prometheus 可以记录前端性能指标，但是受数据类型制约，它并不是最合适的。</strong></p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul><li><a href="https://prometheus.io" target="_blank" rel="noopener">Prometheus 官网</a></li><li><a href="https://blog.csdn.net/polo2044/article/details/83277299" target="_blank" rel="noopener">Prometheus 的数据类型介绍</a></li><li><a href="https://www.colabug.com/227611.html" target="_blank" rel="noopener">prom-client 监控示例</a></li><li><a href="https://www.cnblogs.com/aguncn/p/9920545.html" target="_blank" rel="noopener">如何区分 Prometheus 中 Histogram 和 Summary 类型的 metrics?</a></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 后端 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 性能监控 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>前端性能监控</title>
+      <link href="/2019/07/11/%E5%89%8D%E7%AB%AF%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7-Performance/"/>
+      <url>/2019/07/11/%E5%89%8D%E7%AB%AF%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7-Performance/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;平常只在测试环境测过前端页面性能，到了真实环境用户的手机上，页面性能的具体表现却未曾了解。H5新增的 Performance API 可以精确的测量网页性能。使开发者可以通过数据上报的方式收集线上H5页面的性能表现，以合理优化页面性能短板，提升用户体验。<br><a id="more"></a></p><h3 id="前端性能监控指标"><a href="#前端性能监控指标" class="headerlink" title="前端性能监控指标"></a>前端性能监控指标</h3><ul><li><strong>白屏时间</strong>: 从打开网站到有内容渲染出来的时间节点</li><li><strong>首屏时间</strong>: 首屏内容渲染完毕的时间节点</li><li><strong>domReady 时间</strong>: 用户可操作的时间节点</li><li><strong>onload 时间</strong>: 总下载时间</li></ul><h3 id="Performance-API-简介"><a href="#Performance-API-简介" class="headerlink" title="Performance API 简介"></a>Performance API 简介</h3><p>&emsp;&emsp;<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Performance" target="_blank" rel="noopener">Performace</a>是 html5的新特性之一，该接口会返回当前页面性能相关的信息。Performance 对象一共提供了4个属性：</p><ul><li><strong>navigation</strong>: 包含页面加载、刷新、重定向情况</li><li><strong>timing</strong>: 包含了各种与浏览器性能有关的时间数据</li><li><strong>memory</strong>: 返回JavaScript对内存的占用</li><li><strong>timeOrigin</strong>: 返回性能测量开始时的时间的高精度时间戳</li></ul><p>本文主要讨论 Performance 的 timing 对象以及其他几种统计指标。</p><h4 id="performance-timing"><a href="#performance-timing" class="headerlink" title="performance.timing"></a>performance.timing</h4><p>timing 对象提供了各种与浏览器处理相关的时间数据(<a href="https://segmentfault.com/a/1190000014479800" target="_blank" rel="noopener">详细</a>)，各时间节点可参照下图:<br><img src="/2019/07/11/前端性能监控-Performance/performance.png" alt=""></p><p>其中常用的几项计算指标如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> timing = performance.timing;</span><br><span class="line"><span class="keyword">var</span> times = &#123;&#125;;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 请求耗时</span></span><br><span class="line">times.request = timing.responseEnd - timing.requestStart || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 页面白屏时间</span></span><br><span class="line">times.ttfb = timing.responseStart - timing.navigationStart || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 页面可操作时间</span></span><br><span class="line">times.domReady = timing.domComplete - timing.responseEnd || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//dom渲染时间</span></span><br><span class="line">times.domRender = timing.domContentLoadedEventEnd - timing.navigationStart || <span class="number">0</span>,</span><br><span class="line"></span><br><span class="line"><span class="comment">// 总下载时间</span></span><br><span class="line">times.onload = timing.loadEventEnd - timing.navigationStart || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DNS解析时间</span></span><br><span class="line">times.lookupDomain = timing.domainLookupEnd - timing.domainLookupStart || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// TCP建立时间</span></span><br><span class="line">times.tcp = timing.connectEnd - timing.connectStart || <span class="number">0</span>,</span><br><span class="line"></span><br><span class="line"><span class="comment">// 首屏时间</span></span><br><span class="line">times.now = performance.now();</span><br></pre></td></tr></table></figure></p><h3 id="performance-now"><a href="#performance-now" class="headerlink" title="performance.now()"></a>performance.now()</h3><p>&emsp;&emsp;返回当前网页从performance.timing.navigationStart到当前时间之间的微秒数</p><h3 id="performance-getEntries"><a href="#performance-getEntries" class="headerlink" title="performance.getEntries()"></a>performance.getEntries()</h3><p>&emsp;&emsp;浏览器获取网页时，会对网页中每一个对象（脚本文件、样式表、图片文件等等）发出一个HTTP请求。performance.getEntries方法以数组形式，返回这些请求的时间统计信息，有多少个请求，返回数组就会有多少个成员。</p><h3 id="数据埋点及上报方式"><a href="#数据埋点及上报方式" class="headerlink" title="数据埋点及上报方式"></a>数据埋点及上报方式</h3><p>&emsp;&emsp;工作中采用的埋点方式是脚本引入。该脚本负责收集浏览器性能指标信息，并生成一个 &lt;script> 节点，将指标信息拼接成 url param 的形式，通过 &lt;script> 标签的 src 属性发起请求，将数据上报到服务器。</p><h3 id="前端性能监控系统"><a href="#前端性能监控系统" class="headerlink" title="前端性能监控系统"></a>前端性能监控系统</h3><p>&emsp;&emsp;在github上发现的比较好的参考工具：</p><ul><li>数据上报插件: <a href="https://github.com/wangweianger/web-report-sdk" target="_blank" rel="noopener">web-report-sdk</a></li><li>前端性能监控UI: <a href="http://hubing.online:8083/#/sys/5cb68708838abf131c718ed1/index" target="_blank" rel="noopener">web-monitoring</a></li></ul><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://blog.csdn.net/weixin_42284354/article/details/80416157" target="_blank" rel="noopener">前端性能监控-window.performance</a><br><a href="http://javascript.ruanyifeng.com/bom/performance.html" target="_blank" rel="noopener">Performance API-ruanyifeng</a><br><a href="https://segmentfault.com/a/1190000014479800" target="_blank" rel="noopener">初探Performance API</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 前端 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 性能监控 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>IP地址和子网划分</title>
+      <link href="/2019/06/02/IP%E5%9C%B0%E5%9D%80%E5%92%8C%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86/"/>
+      <url>/2019/06/02/IP%E5%9C%B0%E5%9D%80%E5%92%8C%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86/</url>
+      
+        <content type="html"><![CDATA[<p>计算机知识补全计划：ip地址、子网掩码相关笔记。<br><a id="more"></a></p><p>MAC地址：决定下跳给哪个设备<br>IP地址：决定数据最终到达的计算机<br>子网掩码：用来判断两台机器的ip地址是否处于同一网段<br><strong><a href="https://www.bilibili.com/video/av17905625" target="_blank" rel="noopener">课程链接</a></strong></p><p>一、IP地址<br>    IP地址是由32位二进制组成的，写成十进制，每四位以逗号分隔：如<code>192.168.30.10</code>。IP地址分为两部分，一部分是网络部分，另一部分是主机部分；在同一网段的计算机，网络部分一样，主机部分不一样，<code>子网掩码</code>就是用来区分主机与网段的。</p><ol><li>子网掩码<br>两台计算机在通信之前，首先需要判断需要进行通信的设备与当前的设备是否处于同一网段之中：<code>IP地址</code>和<code>子网掩码</code>做<code>与运算</code>得出的结果就是网络部分，网络部分相同则处于同一网段。<br>例如：A计算机想与B计算机通信，首先A将A的子网掩码和A的IP地址进行与运算，再将A的子网掩码和B的IP地址进行运算，若二者结果相同，则处于同一网段。</li><li>IP地址的分类<ul><li>A类：1-127  缺省子网掩码：255.0.0.0</li><li>B类：128-191 缺省子网掩码：255.255.0.0</li><li>C类：192-223 缺省子网掩码：255.255.255.0</li><li>D类（组播）：224-239 缺省子网掩码：无</li><li>E类（研究）：240-255 缺省子网掩码：无<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0----------128-----192---224-240-255]</span><br></pre></td></tr></table></figure></li></ul></li></ol><p>在分配IP地址时注意：<br><code>xxx.0.0.0</code>：全0表示这个子网的网络号，不可用；<br><code>xxx.255.255.255</code>：全1表示这个子网的广播地址，代表网段内所有计算机，可跨网段，不可用。（注意，若全为255，则只能发送给本网段的机器，不能跨网段）<br>例如C类地址，能设置的主机号只有2-254，一般路由器的ip地址为该网段内的第一个或者最后一个，避免冲突。</p><ol start="3"><li>保留地址<ul><li>保留的私网地址（不在公网上，相互之间不能通信（内网））：<ul><li>A 10.0.0.0</li><li>B 172.16.0.0 – 172.31.0.0</li><li>C 192.168.0.0 – 192.168.255.0</li></ul></li><li>本地环回地址<ul><li>127.0.0.1 本机</li><li>169.254.0.0 断网地址</li><li>224.0.0.1 特殊的组播地址，代表所有主机地址</li></ul></li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机相关知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>微信授权流程</title>
+      <link href="/2019/05/30/%E5%BE%AE%E4%BF%A1%E6%8E%88%E6%9D%83%E6%B5%81%E7%A8%8B/"/>
+      <url>/2019/05/30/%E5%BE%AE%E4%BF%A1%E6%8E%88%E6%9D%83%E6%B5%81%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<p>在公司制作H5页面的时候，有这样一个场景：在微信打开H5页面，已经绑定微信的用户直接免密登录，未绑定的用户使用传统账号密码的登录方式。其中免密登录的核心一环就是走一个微信授权流程，原理不难，弄懂它的流程比较重要。<br><a id="more"></a></p><h3 id="微信网页授权官方文档"><a href="#微信网页授权官方文档" class="headerlink" title="微信网页授权官方文档"></a><a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421140842" target="_blank" rel="noopener">微信网页授权官方文档</a></h3><p>当用户在微信中访问第三方网页的时候，公众号可以通过微信网页授权机制来获取用户基本信息。在授权过程中，<code>openid</code>作为用户的唯一标识，同一个用户不同公众号的<code>openid</code>不同，反之亦然。</p><ul><li>在发起授权前，需要到微信公众平台开发的官网设置授权回调的域名；</li><li>openid: 用户唯一标识；</li><li>code: <code>code</code>作为换取<code>access_token</code>的票据，每次用户授权带上的<code>code</code>将不一样，<code>code</code>只能使用一次，5分钟未被使用自动过期；</li><li>access_token: 网页授权接口调用凭证；</li><li>scope：用户授权的作用域；<ul><li>以<code>snsapi_base</code>为<code>scope</code>发起的网页授权，是用来获取进入页面的用户的openid的，并且是静默授权并自动跳转到回调页（往往是业务页面）。用户无感知。</li><li>以<code>snsapi_userinfo</code>为<code>scope</code>发起的网页授权，是用来获取用户的基本信息的。但这种授权需要用户手动同意，并且由于用户同意过，所以无须关注，就可在授权后获取该用户的基本信息。</li></ul></li></ul><h3 id="微信免密登录流程图"><a href="#微信免密登录流程图" class="headerlink" title="微信免密登录流程图"></a>微信免密登录流程图</h3><p><img src="/2019/05/30/微信授权流程/flowChart.png" alt="微信免密登录流程图"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 其他小结 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 微信授权 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>正则表达式学习笔记</title>
+      <link href="/2019/04/13/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+      <url>/2019/04/13/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[<p>把2017年的笔记整理一下，方便查找。记录了js正则表达式常用的概念、字符、以及方法。<br><a id="more"></a> </p><h3 id="一、RegExp对象"><a href="#一、RegExp对象" class="headerlink" title="一、RegExp对象"></a>一、RegExp对象</h3><p>JavaScript通过通过内置对象RegExp支持正则表达式，有两种方法实例化RegExp对象：</p><ol><li>字面量：<code>var reg = /文本/g</code></li><li>构造函数：<code>var reg = new RegExp(&quot;\\bis\\b\&quot;, &#39;g&#39;)</code></li></ol><h3 id="二、修饰符"><a href="#二、修饰符" class="headerlink" title="二、修饰符"></a>二、修饰符</h3><table><thead><tr><th>修饰符</th><th>含义</th></tr></thead><tbody><tr><td>g: glogbal</td><td>全文搜索（默认搜索到第一个匹配停止）</td></tr><tr><td>i: ignore case</td><td>忽略大小写（默认大小写敏感）</td></tr><tr><td>m: multiple lines</td><td>多行搜索</td></tr></tbody></table><h3 id="三、元字符"><a href="#三、元字符" class="headerlink" title="三、元字符"></a>三、元字符</h3><p>如（*+$^.|(){}[]）等，指在正则表达式中有特殊含义的非字母字符。一般情况下正则表达式的一个字符对应字符串的一个字符。<br><strong>匹配<code>+</code>等特殊字符，可先转义，再匹配，如<code>string.replace(/[\+]/g, &quot;&quot;)</code></strong></p><ol><li><p>普通类<code>[]</code><br>若要对应多个字符，可用元字符<code>[]</code>来构建一个简单的类，所谓类是指符合某些特性的对象，一个泛指，而不是特指某个字符。  </p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'a1b2c3d4'</span>.replace(<span class="regexp">/[abc]/gi</span>, <span class="string">'X'</span>) <span class="comment">//"X1X2X3X4"</span></span><br></pre></td></tr></table></figure></li><li><p>反向类<code>[^xx]</code><br><code>[^..]</code>使用元字符<code>^</code>创建反向类，即不属于某类的内容。  </p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'a1b2c3d4'</span>.replace(<span class="regexp">/[^abc]/gi</span>, <span class="string">'X'</span>) <span class="comment">//"aXbXcXXX"</span></span><br></pre></td></tr></table></figure></li><li><p>范围类<code>[x-x]</code><br>使用<code>[a-z]</code>来连接两个字符，表示从a到z的任意字符 （包含a，z本身）。在<code>[]</code>组成类的内部可以连写<code>[a-zA-Z]</code></p></li><li>预定义类<br>正则表达式提供预定义类来匹配常见字符类</li></ol><table><thead><tr><th>字符</th><th>等价类</th><th>含义</th></tr></thead><tbody><tr><td>.</td><td>[^\r\n]</td><td>除回车符和换行符之外的所有字符</td></tr><tr><td>\d</td><td>[0-9]</td><td>数字字符</td></tr><tr><td>\D</td><td>[^0-9]</td><td>非数字字符</td></tr><tr><td>\s</td><td>[\t\n\f\r]</td><td>空白符</td></tr><tr><td>\S</td><td>[^\t\n\f\r]</td><td>非空白符</td></tr><tr><td>\w</td><td>[a-zA-Z_0-9]</td><td>单词字符(字母、数字、下划线)</td></tr><tr><td>\W</td><td>[^a-zA-Z_0-9]</td><td>非单词字符</td></tr></tbody></table><ol start="5"><li>边界<br>常见的边界匹配字符如下</li></ol><table><thead><tr><th>字符</th><th>含义</th></tr></thead><tbody><tr><td>^</td><td>以xxx开始（注意<code>^</code>要写在字符前面）</td></tr><tr><td>$</td><td>以xxx结束（注意<code>$</code>要写在字符后面）</td></tr><tr><td>\b</td><td>单词边界</td></tr><tr><td>\B</td><td>非单词边界</td></tr></tbody></table><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'@123@abc@'</span>.replace(<span class="string">'^@'</span>, <span class="string">'Q'</span>); <span class="comment">//"Q123@abc@" </span></span><br><span class="line"><span class="string">'@123@abc@'</span>.replace(<span class="string">'@$'</span>, <span class="string">'Q'</span>); <span class="comment">//"Q123@abcQ"</span></span><br></pre></td></tr></table></figure><ol start="6"><li>量词<br>匹配连续出现多次的字符串（仅作用于紧挨着它的字符）</li></ol><table><thead><tr><th>字符</th><th>含义</th></tr></thead><tbody><tr><td>?</td><td>出现零或一次（最多出现一次）</td></tr><tr><td>+</td><td>出现一次或多次（至少出现一次）</td></tr><tr><td>*</td><td>出现零次或多次（任意次）</td></tr><tr><td>{n}</td><td>出现n次</td></tr><tr><td>{n,m}</td><td>出现n到m次</td></tr><tr><td>{n,}</td><td>至少出现n次</td></tr><tr><td>{0,m}</td><td>至多出现m次</td></tr></tbody></table><ul><li><p>贪婪模式<br>尽可能多的匹配，直到匹配失败</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'12345678'</span>.replace(<span class="regexp">/\d&#123;3,6&#125;/g</span>,<span class="string">'X'</span>); <span class="comment">//"X78"</span></span><br></pre></td></tr></table></figure></li><li><p>非贪婪模式（在量词后边加<code>?</code>）<br>尽可能少的匹配，一旦匹配成功，不再继续尝试</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'12345678'</span>.replace(<span class="regexp">/\d&#123;3,6&#125;？/g</span>, <span class="string">'X'</span>); <span class="comment">//"XX78"</span></span><br></pre></td></tr></table></figure></li></ul><ol start="7"><li><p>分组<br>使用<code>()</code>可以达到分组的功能，使量词作用于分组</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'a1b2c3d4'</span>.replace(<span class="regexp">/([a-z]\d&#123;3&#125;)g/</span>, <span class="string">'X'</span>) <span class="comment">//"Xd4"</span></span><br></pre></td></tr></table></figure></li><li><p>反向引用<br>使用<code>$1、$2、$3...</code>来表示和捕获分组后的内容</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'17741881234'</span>.replace(<span class="regexp">/(.&#123;3&#125;)(.&#123;4&#125;)(.&#123;4&#125;)/</span>, <span class="string">'$1****$3'</span>) <span class="comment">//"177****1234"</span></span><br></pre></td></tr></table></figure></li><li><p>忽略分组<br>不希望捕获某些分组，只需要在分组内加上<code>?:</code>即可</p></li><li>或<br>使用<code>|</code>可以达到或的效果</li><li>前瞻<br>正则表达式从文本头部向文本尾部开始解析。 <strong>文本尾部的方向，称为“前”，文本头部称为“后”。</strong> 前瞻就是在正则表达式匹配规则的时候，向前检查是否符合断言（条件），后顾/后瞻方向相反。JavaScirpt不支持后顾。<strong>符合/不符合</strong> 特定断言称为 <strong>肯定/正向匹配</strong> 和 <strong>否定/负向匹配</strong>。</li></ol><h3 id="四、RegExp对象方法"><a href="#四、RegExp对象方法" class="headerlink" title="四、RegExp对象方法"></a>四、RegExp对象方法</h3><ul><li><strong>RegExp.prototype.test(str)</strong><br>用于测试字符串参数中是否存在匹配正则表达式的字符串，若存在返回true，否则返回false</li><li><strong>RegExp.prototype.exec(str)</strong><br>使用正则表达式模式对字符串执行搜索，并将更新全局RegExp对象的属性以反映匹配结果。如果没有匹配的文本则返回null，否则返回一个结果数组。</li></ul><h3 id="五、String对象方法"><a href="#五、String对象方法" class="headerlink" title="五、String对象方法"></a>五、String对象方法</h3><ul><li><strong>String.prototype.search(reg)</strong><br>用于检索字符串中指定的子字符串，或检索与正则表达式相匹配的子字符串。方法返回第一个匹配结果的index，查找不到返回-1。search()方法不执行全局匹配，它将忽略标志g，并且总是从字符串的开始进行检索。</li><li><strong>String.prototype.match(reg)</strong><br>用于检索字符串，以找到一个或者多个与正则表达式匹配的文本。如果匹配到了一个或多个字符串，则返回一个数组，若没有匹配到，则返回null。它不会忽略全局标志g。</li><li><strong>String.prototype.split(reg)</strong><br>使用split方法把字符串分割为字符数组。</li><li><strong>String.prototype.replace(str/reg, str)</strong><br>用于替换字符串中匹配正则表达式或字符串的文本。</li></ul><h3 id="六、常用的正则表达式记录"><a href="#六、常用的正则表达式记录" class="headerlink" title="六、常用的正则表达式记录"></a>六、常用的正则表达式记录</h3><p><a href="https://www.cnblogs.com/Kuro-P/p/8971349.html" target="_blank" rel="noopener">https://www.cnblogs.com/Kuro-P/p/8971349.html</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 前端 </category>
+          
+          <category> JavaScript </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JavaScript </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>前端模块化</title>
+      <link href="/2019/01/03/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96/"/>
+      <url>/2019/01/03/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96/</url>
+      
+        <content type="html"><![CDATA[<p>目前JS模块化规范主要三种：浏览器端的 <strong>AMD</strong>、<strong>CMD</strong> 规范和nodeJS端的 <strong>commonJS</strong> 规范。经常被exports、modules.exports、export、require绕懵，遂来探一探究竟。</p><h4 id="AMD规范-requireJS-浏览器端-异步加载模块-提前执行"><a href="#AMD规范-requireJS-浏览器端-异步加载模块-提前执行" class="headerlink" title="AMD规范 (requireJS) 浏览器端 异步加载模块 提前执行"></a>AMD规范 (requireJS) 浏览器端 异步加载模块 提前执行</h4><p>AMD 是 RequireJS 在推广过程中对模块定义的规范化产出。<br>RequireJS 帮开发者解决了各个js文件的依赖问题，让开发者在页面引入多个js时，不必考虑各个js的依赖关系，用 <code>define</code> 定义模块，用 <code>require</code> 引入。</p><h4 id="CMD规范-SeaJS-浏览器端-异步加载模块-延迟执行"><a href="#CMD规范-SeaJS-浏览器端-异步加载模块-延迟执行" class="headerlink" title="CMD规范 (SeaJS) 浏览器端 异步加载模块 延迟执行"></a>CMD规范 (SeaJS) 浏览器端 异步加载模块 延迟执行</h4><p>CMD 是 SeaJS 在推广过程中对模块定义的规范化产出。<br>CMD 跟 AMD 很像，也使用 <code>define</code> 来定义模块，它俩主要是依赖加载的时间点不一样。相比于 AMD 依赖前置，CDM 加载采用就近原则。</p><h4 id="commonJS-服务端-同步加载模块"><a href="#commonJS-服务端-同步加载模块" class="headerlink" title="commonJS 服务端 同步加载模块"></a>commonJS 服务端 同步加载模块</h4><p>nodeJS的模块引用使用的就是 commonJS 的规范，因为服务端第三方库大多已存于本地，加载速度较快，使用同步加载比较理想。它使用 <code>module.exports</code> 或者是 <code>exports</code> 来导出，使用 <code>require</code> 引入。</p><ul><li>browserify 使浏览器端可以直接使用 require</li><li>webpack 使浏览器端 js 既实现了 AMD 规范也实现了 commonJS 规范</li></ul><h4 id="ES6-的-export-和-import"><a href="#ES6-的-export-和-import" class="headerlink" title="ES6 的 export 和 import"></a>ES6 的 export 和 import</h4><p>ES6 将模块进行了标准化，整合 commonJS 和 AMD 规范，使用 <code>export</code> 或者 <code>export default</code> 来暴露模块，使用 <code>import</code> 导入。</p><p>经过上述总结，大多第三方库声明模块的代码也就不难理解了<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span>) &#123; <span class="comment">// 兼容 requireJS AMD、CMD规范   </span></span><br><span class="line">    define(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> moduleName;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> exports !== <span class="string">'undefined'</span>) &#123; <span class="comment">// 兼容 webpack 引入方式(commonJS) </span></span><br><span class="line">    <span class="built_in">module</span>.exports = moduleName; </span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.moduleName = moduleName; <span class="comment">// 普通引入，注册到全局</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a href="https://github.com/ljianshu/Blog/issues/48" target="_blank" rel="noopener">前端模块化详解(完整版)</a><br><a href="https://www.cnblogs.com/omelette/p/6652472.html" target="_blank" rel="noopener">关于commonjs，AMD，CMD之间的异同</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 前端 </category>
+          
+          <category> JavaScript </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JavaScript </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>2018年终总结</title>
+      <link href="/2018/12/31/2018%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/"/>
+      <url>/2018/12/31/2018%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</url>
+      
+        <content type="html"><![CDATA[<p>2018年仿佛什么都没做，但又仿佛做了些什么；仿佛没有遗憾，但却又心有不甘；以为走到了正确的方向，但“迷茫”二字却困惑了我整整一年。<br><a id="more"></a></p><ul><li>一月：实习、回校考试</li><li>二月：回家过年</li><li>三月：实习、回校选毕设题目</li><li>四月：实习、学习毕设相关知识、投递简历</li><li>五月：实习、开始码毕设、投递简历、跑面试</li><li>六月：回校答辩、毕业</li><li>七月：转正，回公司工作</li><li>八月：工作、去当了一次漫展NPC</li><li>九月：工作、去了一次上海迪士尼</li><li>十月：工作、找房、换房</li><li>十一月：工作</li><li>十二月：工作</li></ul><p>18年主要完成事件就是这些。<br><strong>四、五月</strong> 大概是最忙的时候，因为要管的事情太多，忙到脚打后脑勺。<br><strong>六月</strong> 是全年最开心的阶段，因为回学校了，有室友和同学在。虽然答辩时被老师问到怀疑人生，但最后老师还是给了高分，借此拿了一次奖学金的我也是受宠若惊，以为毕业前再也没有机会拿到了。除了感谢老师以外，还得感谢公司leader，毕设题目是他建议的。<br><strong>七月</strong> 本决定给自己一周毕业旅行的时间，奈何职业方向和家里人冲突升级。取消了打算已久的假期，回公司了。工位发生很大变化，前端组的大家这次都坐在一起了。<br><strong>八月</strong> 第一次去了漫展，也是第一次当NPC，不过应该也都是最后一次了哈哈。遇见了很好的小伙伴们，临走前，没有张口要联系方式，后悔至今。<br><strong>九月</strong> 去了趟迪士尼，事实证明，做攻略还是非常有用滴，项目都玩了，喜欢的也几刷了。遗憾的是，时间来不及，没有买到漫威周边。<br><strong>十月</strong> 相对轻松。十一没出去玩，出去看房，找到合适的就换了，室友也换了，承蒙了之前两位姐姐很多照顾，有时会怀念。十月末公司团建，挺好玩嗒。<br><strong>十一月</strong>，中旬心心念念的 blog 诞生了，虽然不难，但也是历史性的一步！毕竟从去年就开始惦记着…<br><strong>十二月</strong>，成长。双十二的时候，买了新水彩颜料，终于把雄狮换成鲁本斯了。</p><p>18年看似很充实，实际一年到头可以收获的东西却寥寥无几，全年没有明确的方向，只是被时间推着做事。<br>希望19年找到自己的目标和方向。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 年度总结 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Linux命令行与shell脚本学习</title>
+      <link href="/2018/11/30/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC%E5%AD%A6%E4%B9%A0/"/>
+      <url>/2018/11/30/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%8Eshell%E8%84%9A%E6%9C%AC%E5%AD%A6%E4%B9%A0/</url>
+      
+        <content type="html"><![CDATA[<p>《Linux命令行与shell脚本编程大全》读书小结，熟悉一下常用的命令行操作。书籍比较基础，对熟悉Linux命令行的人来说参考意义不大。主要记录下书中提到的、没提到的常用的命令。<br><a id="more"></a></p><h3 id="基础操作"><a href="#基础操作" class="headerlink" title="基础操作"></a>基础操作</h3><ul><li>. 代表当前目录</li><li>.. 代表父级目录</li><li>~ 代表根目录 表名当前工作目录位于用户home目录之下</li><li>man &lt;directive> 可查看指令可使用的参数手册</li><li><code>tab</code> 键自动补全文件名</li><li>cd 切换目录</li><li>linux 中的文件路径全部采用正斜线<code>/</code>，windows中的路径都是反斜线<code>\</code>而且带盘符</li><li>ls 列出当前路径下的所有文件<ul><li>-F 在显示子目录的时候在它的文件名之后加上一个斜线(“/”)字符</li><li>-F -R 遍历(递归)出当前目录下的子文件夹的所有内容(可以缩写成 ls -FR )</li><li>-a 列出所有文件，包括隐藏文件</li><li>-l 列出文件的所有信息</li></ul></li><li>pwd 查看当前所在位置的全路径</li><li>sudo 以 root 用户身份运行命令</li></ul><h3 id="文件基础操作"><a href="#文件基础操作" class="headerlink" title="文件基础操作"></a>文件基础操作</h3><ul><li>open &lt;fileName> 用默认程序打开文件</li><li>touch &lt;fileName> 创建一个文件 (不可在不存在的目录下新建文件)</li><li>mkdir &lt;directory> 创建一个文件夹<ul><li>-p 创建多个层级的文件夹</li></ul></li><li>rmdir &lt;directory> 只删除空目录<ul><li>在非空目录下使用 rm -r 命令</li></ul></li><li>cp &lt;fileName> &lt;targetDirectory/fileName&gt; 复制文件到目标文件夹/文件名<ul><li>-i 强制 shell 询问是否覆盖同名文件</li></ul></li><li>scp &lt;fileName> &lt;root@targetPath&gt; 远程拷贝文件 可以跨服务器</li><li>mv &lt;fileName> &lt;directory/fileName&gt; 用来 移动/重命名 文件<ul><li>-i 强制 shell 询问是否覆盖同名文件</li></ul></li><li>rm &lt;fileName> 删除文件/文件夹中的所有内容<ul><li>-i 强制 shell 询问是否删除文件</li><li>-f 强制删除，没有警告信息也没有声音提示</li><li>-r 递归删除目录及目录内所有文件  </li><li><strong>注意：Linux 中没有回收站或垃圾箱，文件一旦删除，就无法再找回</strong></li></ul></li></ul><h3 id="文件信息操作"><a href="#文件信息操作" class="headerlink" title="文件信息操作"></a>文件信息操作</h3><ul><li>file &lt;fileName/directoryName> 查看文件类型信息</li><li>du &lt;fileName/directoryName> 用来查看文件或目录所占用的磁盘空间的大小<ul><li>-h 以易于阅读的方式展示</li><li>-a 显示目录及其下子目录和文件占用的磁盘空间大小</li><li>-s 只展示当前目录占用磁盘空间大小</li></ul></li><li>cat/more/less &lt;fileName> 查看整个文件内容<ul><li>cat 一次性加载完所有文件内容</li><li>more 一次显示一屏文本</li><li>less 一次显示一屏文本 可以上下页翻建</li></ul></li><li>tail/head &lt;fileName> 查看部分文件内容<ul><li>tail 默认展示文件最后10行的效果<ul><li>-n 2 只显示文件最后两行</li><li>-f 允许其他进程使用该文件时查看该文件的内容，tail会保持活跃状态，并不断显示添加到文件中的内容。（可用来实时监测系统日志）</li></ul></li><li>head 默认展示文件前10行内容<ul><li>不支持 -f 属性</li></ul></li></ul></li><li>grep match_pattern &lt;fileName> 强大的文本搜索工具，可以使用正则表达式搜索文本，并显示出匹配的行数</li><li>ls -l &lt;fileName> 查看文件权限</li><li>chmod value &lt;fileName> 更改文件权限<ul><li>权限描述顺序依次是：Owner、Group、Other</li><li>r=读取属性 //值=4</li><li>w=写入属性 //值=2</li><li>x=执行属性 //值=1</li></ul></li></ul><h3 id="监控进程"><a href="#监控进程" class="headerlink" title="监控进程"></a>监控进程</h3><ul><li>ps 显示进程信息（瞬间占用情况）</li><li>top 显示进程信息（实时占用情况）</li><li>lsof 查看进程打开的文件<ul><li>lsof -i:4000 查看4000端口占用情况</li></ul></li><li>kill [PID] 杀死对应进程</li></ul><h3 id="网络情况"><a href="#网络情况" class="headerlink" title="网络情况"></a>网络情况</h3><ul><li>ping &lt;ip> 测试主机之间的连通性(不会自动结束，需要手动 ctrl + c 强制退出)</li><li>dig &lt;url> 域名查询工具，可以用来测试域名系统工作是否正常</li><li>nsloopup &lt;url> 域名查询工具，查询 DNS 相关信息</li></ul><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><ul><li>printenv/env 默认输出所有环境变量（全局）<ul><li>printenv JAVA_HOME 输出全局设置的JAVA SDK位置</li><li>env $JAVA_HOME </li><li>echo $JAVA_HOME </li></ul></li><li>echo $variableName 输出变量 ($用来表名它是个变量)</li><li>set 输出所有环境变量（全局和局部）</li><li>$HOME 表示的用户的主目录，与波浪线<code>~</code>作用一样</li><li><strong>注意：所有的环境变量名均使用大写字母，若是自己创建的局部变量或是shell脚本，则用小写字母，变量名区分大小写。</strong></li><li><strong>赋值时，变量名、等号和值之间没有空格</strong></li><li><strong>若要给变量赋值一个含空格的字符串，则需要用单引号括起来</strong></li></ul><h3 id="vim-操作"><a href="#vim-操作" class="headerlink" title="vim 操作"></a>vim 操作</h3><ul><li>vim &lt;fileName> 以 vim 编辑器的方式查看当前文件</li><li>按 <code>I</code> 对文件进行 INSERT 操作</li><li>按 <code>esc</code> 退出当前编辑模式</li><li>输入 <code>:</code> 切换到底线命令模式，可以在最底行输入其他命令</li><li>输入 <code>!wq</code> ，保存并退出；输入 <code>!q</code>，不保存直接退出</li><li>.swp 文件: 非正常关闭的 vim 编辑器会生成一个 .swp 文件 </li></ul><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul><li>alias 可用来查看当前可用的别名(内建命令)<ul><li>alias 新的命令=’原命令 -选项/参数’ 用来定义命令别名</li></ul></li><li>sh &lt;fileName.sh> 执行shell文件</li><li>.xxxrc 可以看做是xxx启动运行时的配置文件<ul><li>例如 .zshrc 就是 zsh 运行前要执行配置文件</li></ul></li><li>source &lt;fileName> 或者 . &lt;fileName> (bash内部命令) 加载文件</li></ul><h3 id="常用的配置文件地址"><a href="#常用的配置文件地址" class="headerlink" title="常用的配置文件地址"></a>常用的配置文件地址</h3><ul><li>Host文件 /etc/hosts</li><li>配置的SSH Key: cat ~/.ssh/id_rsa.pub</li></ul><h3 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h3><ul><li>homebrew 包管理器<ul><li>brew install &lt;packageName> 安装插件</li><li>brew list 查看电脑安装了哪些插件</li></ul></li><li>wget 下载网页常用的工具</li><li>curl 模拟htpp请求，类似于 POSTMAN<ul><li>curl &lt;url> 直接返回 url 请求结果</li></ul></li><li>tree 以树状图形式展示目录及其子文件<ul><li>tree &lt;directory> -J 以 json 形式展示文件</li></ul></li><li>tig 将git命令行可视化</li></ul><p><strong>其他参考:</strong></p><ul><li><strong><a href="http://man.linuxde.net/" target="_blank" rel="noopener">Linux命令大全</a></strong></li><li><strong><a href="http://blog.chinaunix.net/uid-27164517-id-3299073.html" target="_blank" rel="noopener">Linux命令英文缩写的含义</a></strong></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机相关知识 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Linux&amp;shell </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>同时使用两个账号分别操作Github和Gitlab</title>
+      <link href="/2018/11/17/%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8%E4%B8%A4%E4%B8%AA%E8%B4%A6%E5%8F%B7%E5%88%86%E5%88%AB%E6%93%8D%E4%BD%9CGithub%E5%92%8CGitlab/"/>
+      <url>/2018/11/17/%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8%E4%B8%A4%E4%B8%AA%E8%B4%A6%E5%8F%B7%E5%88%86%E5%88%AB%E6%93%8D%E4%BD%9CGithub%E5%92%8CGitlab/</url>
+      
+        <content type="html"><![CDATA[<p>公司用 gitlab 存管代码，自己用 github 。懒得下班后用自己电脑提交到 github ，故学习一下如何在同一台电脑上使用两个 git 账号。在 SSH config 中为不同的域名指定不同的SSH key，之后再将自己本地的 github 库的 git config – local 设置成自己的 github 账号。<br><a id="more"></a></p><h3 id="一、生成SSH秘钥"><a href="#一、生成SSH秘钥" class="headerlink" title="一、生成SSH秘钥"></a>一、生成SSH秘钥</h3><p>分别对githubn和gitlab生成对应的密钥</p><ul><li>用<code>ssh-keygen -t rsa -C &quot;公司邮箱地址&quot;</code>生成对应的gitlab密钥：id_rsa和id_rsa.pub</li><li>将 gitlab 公钥(id_rsa.pub)中的内容配置到公司的gitlab上</li><li>用<code>ssh-keygen -t rsa -C &quot;自己邮箱地址&quot; -f ~/.ssh/github_rsa</code>生成对应的github密钥：github_rsa和github_rsa.pub</li><li>将 github 公钥(github_rsa.pub)中的内容配置到自己的github上</li><li>进入密钥生成的位置，创建一个 config 文件，添加配置：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># githab</span><br><span class="line">Host github.com</span><br><span class="line">    HostName github.com</span><br><span class="line">    IdentityFile ~/.ssh/github_rsa</span><br></pre></td></tr></table></figure></li></ul><p>注意：这里不配置 config 文件的话，测试与 github 的连接会报错 Permission denied (publickey) ，因为 github 默认查找的是~/.ssh/id_rsa。</p><h3 id="二、测试连接"><a href="#二、测试连接" class="headerlink" title="二、测试连接"></a>二、测试连接</h3><p>运行<code>ssh -T git@hostName</code>命令测试 ssh key 对 gitlab 与 github的连接<br><img src="/2018/11/17/同时使用两个账号分别操作Github和Gitlab/test-ssh-connect.png" alt="测试连接是否正常"><br>如果能看到一些 Welcome 信息，说明是 OK 的。</p><h3 id="三、配置-git-库"><a href="#三、配置-git-库" class="headerlink" title="三、配置 git 库"></a>三、配置 git 库</h3><p>由于全局配置是公司的账号，所以只需要对自己想要进行操作的 github 库进行本地配置即可。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --local user.name &apos;username&apos; # github账号名称</span><br><span class="line">git config --local user.email &apos;username@gmail.com&apos; # github账号邮箱</span><br></pre></td></tr></table></figure></p><p>或者直接 init 一个 git 库，配置后 github 的代码都在这个仓库下拉取。</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://segmentfault.com/a/1190000014626841?utm_source=channel-hottest" target="_blank" rel="noopener">如何在同一台电脑上使用github和gitlab</a><br><a href="https://blog.csdn.net/mycafe_/article/details/79231599" target="_blank" rel="noopener">同时使用两个账号分别操作Github和Gitlab</a><br><a href="http://www.cnblogs.com/lpdi/p/6816380.html" target="_blank" rel="noopener">由于SSH配置文件的不匹配，导致的Permission denied (publickey)及其解决方法</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> git </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hexo 基础使用</title>
+      <link href="/2018/11/17/Hexo-%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/"/>
+      <url>/2018/11/17/Hexo-%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>node 环境下，全局安装 hexo-cli<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-cli -g</span><br></pre></td></tr></table></figure></p><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>进入到一个放置blog的<strong>空文件夹</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo init </span><br><span class="line">hexo generate</span><br><span class="line">hexo server # 默认4000端口</span><br><span class="line">hexo s -p 4001 # 在自定义端口启动</span><br></pre></td></tr></table></figure></p><p>浏览器输入localhost:4000，出现blog界面</p><h3 id="换主题"><a href="#换主题" class="headerlink" title="换主题"></a>换主题</h3><p>Hexo官网提供了一些主题  <a href="https://hexo.io/themes/" target="_blank" rel="noopener">https://hexo.io/themes/ </a> </p><ul><li>git clone 主题地址到 blog 目录下，将全局_condig.yml中的theme名字改为clone下来的文件夹的名字</li><li>主题中有可供选择的几套样式，更改主题 _config.yml 里的 scheme </li><li>设置代码高亮样式 更改主题 _condig.yml 里的 hightlight_theme</li><li>切换Hexo语言 在全局 _condig.yml 里的 language 改成 zh-Hans 即为主题下的简体中文（默认为英文）</li><li>(更换完主题，需要重启应用，方能生效)</li></ul><h3 id="生成文章"><a href="#生成文章" class="headerlink" title="生成文章"></a>生成文章</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hexo new &quot;postName&quot; # /source/_post/postName &amp; .md</span><br><span class="line">hexo new page &quot;pageName&quot; # /source/pageName/index &amp; index.md</span><br><span class="line">hexo generate # /source/.md -&gt; /public/.html</span><br><span class="line">hexo server </span><br><span class="line">hexo deploy #将.deploy目录部署到GitHub</span><br></pre></td></tr></table></figure><h3 id="删除文章"><a href="#删除文章" class="headerlink" title="删除文章"></a>删除文章</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean # delete /public</span><br><span class="line">hexo generate # regenerate /public</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul><li><strong>插入本地图片</strong><br>每次<code>hexo new &#39;postName&#39;</code>时，都会创建一个与文章名相同的文件夹，将文章所需资源放入该文件夹里，引用的时候直接写文件名即可。</li><li><strong>页面增加“阅读更多”按钮</strong><br>在 .md 文件中增加<code>&lt;!--more--&gt;</code>注释，如果想自动添加“阅读更多”按钮，可在主题下的<code>_config.yml</code>中将<code>auto_excerpt</code>下的<code>enable</code>设置为<code>true</code>。</li></ul><h3 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h3><ul><li><a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git</a> 一键部署到 GitPage</li><li><a href="https://github.com/mythsman/hexo-douban" target="_blank" rel="noopener">hexo-douban</a> 爬取豆瓣相关信息</li><li><a href="https://github.com/wzpan/hexo-generator-search" target="_blank" rel="noopener">hexo-generator-search</a> 全文搜索功能</li></ul><h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h3><p><code>hexo d</code>部署前，需要安装<code>npm install hexo-deployer-git --save</code>。<br>修改全局 <code>_config.yml</code> 中的配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">    type: git</span><br><span class="line">    repo: &lt;repository url&gt;</span><br><span class="line">    branch: [branch]</span><br><span class="line">    message: [message]</span><br><span class="line">    name: [git user] </span><br><span class="line">    email: [git email]</span><br><span class="line">    extend_dirs: [extend directory] #其他要提交的目录</span><br><span class="line">    ignore_hidden: true #忽略隐藏文件</span><br><span class="line">    ignore_pattern: regexp #忽略正则匹配的文件</span><br></pre></td></tr></table></figure></p><p>之后，只需要<code>hexo d -g</code>一条命令就可以生成和部署了。关于 hexo-deployer-git 这个插件的参数<a href="https://hexo.io/zh-cn/docs/deployment.html" target="_blank" rel="noopener">hexo官方文档</a>介绍的并不全面，建议去<a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git官方文档</a>查看相关配置参数。</p><p><strong>注意:</strong> </p><ul><li>默认部署，只将生成的HTML相关文件(/public)推送到 github</li><li>若想把本地的生成器项目相关文件也推送到 github，则要配置 <code>extend_dirs: /</code></li><li>message、name、email 的内容要用引号括起来</li><li>name、email 的配置信息用来覆盖全局的 git config 中的配置，更改这两项后，需要删除根目录下的<code>.deploy_git</code>，部署时才会生效</li><li>master 只能放<code>/public</code>下的文件，将项目所有文件放到 master 分支下，会导致页面 build 失败。若想将本地代码全部提交，可部署在其他分支（在<code>_config.yml</code>中增加其他分支配置信息，详情参考文档）</li></ul><h3 id="搜索功能"><a href="#搜索功能" class="headerlink" title="搜索功能"></a>搜索功能</h3><p>全局安装插件<code>npm install hexo-generator-search --save</code><br>修改全局<code>_config.yml</code>中的配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">search:</span><br><span class="line">    path: search.xml</span><br><span class="line">    field: post</span><br><span class="line">    content: true</span><br></pre></td></tr></table></figure></p><p>修改主题<code>themes/next/_config.yml</code>中的配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">local_search:</span><br><span class="line">    enable: true</span><br><span class="line">    trigger: auto</span><br></pre></td></tr></table></figure></p><p>生效：<code>hexo clean</code>、<code>hexo g</code>、<code>hexo s</code></p><h3 id="Hexo目录解析"><a href="#Hexo目录解析" class="headerlink" title="Hexo目录解析"></a>Hexo目录解析</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">├── node_modules # 依赖包-安装插件及所需nodejs模块。</span><br><span class="line">├── public  # 最终网页信息。即存放通过 markdown 渲染出来的 html文件。</span><br><span class="line">├── scaffolds # 模板文件夹。即新建文章时，根据 scaffold 生成文件。</span><br><span class="line">├── source  # 资源文件夹。即存放用户资源。</span><br><span class="line">|   └── _posts # 博客文章目录。</span><br><span class="line">└── themes #存放主题。Hexo根据主题生成静态页面。</span><br><span class="line">├── _config.yml #网站的全局配置信息。标题、网站名称等。</span><br><span class="line">├── db.json：# source 解析所得到的缓存文件。</span><br><span class="line">├── package.json  # 应用程序信息。即配置Hexo运行需要js包。</span><br></pre></td></tr></table></figure><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://cherryblog.site/Use-Gitpagehexo-to-develop-their-own-blog.html" target="_blank" rel="noopener">利用 hexo + Gitpage 开发自己的博客</a><br><a href="https://www.jianshu.com/p/a938da5ddb5d" target="_blank" rel="noopener">hexo浅析原理</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 其他小结 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>《看见》-柴静</title>
+      <link href="/2018/09/07/%E3%80%8A%E7%9C%8B%E8%A7%81%E3%80%8B-%E6%9F%B4%E9%9D%99/"/>
+      <url>/2018/09/07/%E3%80%8A%E7%9C%8B%E8%A7%81%E3%80%8B-%E6%9F%B4%E9%9D%99/</url>
+      
+        <content type="html"><![CDATA[<p>无意间逛知乎的时候发现的书籍片段，留下了很深的印象。从记者的视角看到平日里生活中接触不到的社会另一面，别有一番感触。不愧是著名记者，文笔犀利，干练不拖沓。值得一读的好书：★★★★★<br><a id="more"></a></p><h3 id="第二章-那个温热的跳动就是活着"><a href="#第二章-那个温热的跳动就是活着" class="headerlink" title="第二章 那个温热的跳动就是活着"></a>第二章 那个温热的跳动就是活着</h3><p>我对非典的印象还是停留在小学时候，有那么一段时间，教室里每天清晨和下午都要喷洒消毒水，学校的走廊里弥漫着一股医院的味道。那时还小，只知道这是在预防“非典”，但它到底是什么，我并不知道。</p><blockquote><p>这就是我之前听说的天井。四周楼群间的一块空地，一 个楼与楼之间的天井，加个盖，就成了个完全封闭的空间， 成了输液室，发热的病人都集中到这里来输液。二十七张床 几乎完全挨在一起，中间只有一只拳头的距离。白天也完全靠灯光，没有通风，没有窗，只有一个中央空调的排气口， 这个排气口把病菌传到各处。<br>病历胡乱地堆在桌上，像小山一样，已经发黄发脆。我 犹豫了一秒钟。朱继红几乎是凄然地一笑，说:“我来吧。” 病例被翻开，上面写的都是“肺炎”。他指给我看墙上的黑 板，上面写了二十二个人的名字，其中十九个后面都用白粉 笔写着:肺炎、肺炎、肺炎……<br>“实际上都是 SARS。”他说。</p></blockquote><blockquote><p>一个卫生系统的官员在这里感染，回家又把妻子儿子感染了，想尽办法要住院，只能找到一个床位，夫妇俩让儿子住了进去。两口子发烧得浑身透湿，站不住，只能顫抖着坐在 小板凳上输液。再后来连板凳都坐不住了。孩子痊愈的时候， 父母已经去世。</p></blockquote><p>明明只是在描述，却让人觉得无比震撼。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 闲暇读物 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 读书小结 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Markdown 语法小记</title>
+      <link href="/2018/09/05/MarkDown%E8%AF%AD%E6%B3%95%E5%B0%8F%E8%AE%B0/"/>
+      <url>/2018/09/05/MarkDown%E8%AF%AD%E6%B3%95%E5%B0%8F%E8%AE%B0/</url>
+      
+        <content type="html"><![CDATA[<p>第一个Hexo-next主题的blog，主要用来记录markdown语法<br><a id="more"></a></p><h3 id="测试文本样式"><a href="#测试文本样式" class="headerlink" title="测试文本样式"></a>测试文本样式</h3><h4 id="测试加粗样式"><a href="#测试加粗样式" class="headerlink" title="测试加粗样式"></a>测试加粗样式</h4><p><strong>加粗</strong></p><h4 id="测试斜体样式"><a href="#测试斜体样式" class="headerlink" title="测试斜体样式"></a>测试斜体样式</h4><p><em>斜体</em></p><h4 id="测试删除线样式"><a href="#测试删除线样式" class="headerlink" title="测试删除线样式"></a>测试删除线样式</h4><p><del>删除线</del></p><h4 id="测试引用样式"><a href="#测试引用样式" class="headerlink" title="测试引用样式"></a>测试引用样式</h4><blockquote><p>山穷水尽疑无路，柳暗花明又一村</p></blockquote><h3 id="测试代码样式"><a href="#测试代码样式" class="headerlink" title="测试代码样式"></a>测试代码样式</h3><h4 id="测试指定代码语言代码样式"><a href="#测试指定代码语言代码样式" class="headerlink" title="测试指定代码语言代码样式"></a>测试指定代码语言代码样式</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> FE_developer = &#123;</span><br><span class="line">name: <span class="string">'Kuro'</span>,</span><br><span class="line">age: <span class="string">'22'</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'info'</span>, FE_developer);</span><br></pre></td></tr></table></figure><h4 id="测试单行代码样式"><a href="#测试单行代码样式" class="headerlink" title="测试单行代码样式"></a>测试单行代码样式</h4><p>在JS中我们常用<code>console.log()</code>来输出调试信息。</p><h4 id="测试代码块样式"><a href="#测试代码块样式" class="headerlink" title="测试代码块样式"></a>测试代码块样式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function test(a, b)&#123;</span><br><span class="line">setTimeout(function()&#123;</span><br><span class="line">console.log(a + b);</span><br><span class="line">setTimeout(arguments.callee, 500);</span><br><span class="line">&#125;, 500)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="测试连接样式"><a href="#测试连接样式" class="headerlink" title="测试连接样式"></a>测试连接样式</h3><p>百度一下：<a href="https://www.baidu.com" target="_blank" rel="noopener">Baidu</a></p><h3 id="测试首行缩进样式"><a href="#测试首行缩进样式" class="headerlink" title="测试首行缩进样式"></a>测试首行缩进样式</h3><p>&emsp;&emsp;markdown 语法主要考虑的是英文，中文缩进需要依赖 HTML 的空格符号<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">半角空格: &amp;nbsp;</span><br><span class="line">全角空格：&amp;emsp;</span><br></pre></td></tr></table></figure></p><h3 id="测试表格样式"><a href="#测试表格样式" class="headerlink" title="测试表格样式"></a>测试表格样式</h3><table><thead><tr><th>左对齐</th><th style="text-align:center">居中对齐</th><th style="text-align:right">右对齐</th></tr></thead><tbody><tr><td>Harry Potter</td><td style="text-align:center">Gryffindor</td><td style="text-align:right">90</td></tr><tr><td>Hermione Granger</td><td style="text-align:center">Gryffindor</td><td style="text-align:right">100</td></tr><tr><td>Draco Malfoy</td><td style="text-align:center">Slytherin</td><td style="text-align:right">90</td></tr></tbody></table><p>表格使用 <code>|</code> 来分隔不同的单元格，使用 <code>-</code> 来分隔表头和其他行。<br><strong>注意：表格前若有文本，需要空一行才能正常显示</strong></p><h3 id="测试插入图片"><a href="#测试插入图片" class="headerlink" title="测试插入图片"></a>测试插入图片</h3><p>来自百度图片: <img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1536749860&amp;di=13b529d93aa88d542b4e7d1fece8cd85&amp;imgtype=jpg&amp;er=1&amp;src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F00%2F89%2F85%2F87%2Fs_1024_58bd1a48a0978.png" alt="夏日西瓜" title="西瓜"></p><h3 id="测试列表"><a href="#测试列表" class="headerlink" title="测试列表"></a>测试列表</h3><p>git常用语法</p><ul><li>git status</li><li>git add .</li><li>git commit -m”XXX”</li></ul><ul><li>git stash</li><li>git list</li><li>git stash apply stash@{n}</li></ul><ul><li>git diff</li><li>git reset –hard</li></ul><ol><li>列表内容<ul><li>列表嵌套第一条</li><li>列表嵌套第二条</li></ul></li><li>列表内容</li><li>列表内容</li></ol><h3 id="测试复选框样式"><a href="#测试复选框样式" class="headerlink" title="测试复选框样式"></a>测试复选框样式</h3><ul><li style="list-style: none"><input type="checkbox" checked> 选项一</li><li style="list-style: none"><input type="checkbox"> 选项二</li><li style="list-style: none"><input type="checkbox"> 选项三</li></ul><h3 id="测试流程图样式"><a href="#测试流程图样式" class="headerlink" title="测试流程图样式"></a>测试流程图样式</h3><div id="flowchart-0" class="flow-chart"></div><h3 id="其他注意事项"><a href="#其他注意事项" class="headerlink" title="其他注意事项"></a>其他注意事项</h3><ul><li>在 Markdown 中直接使用尖括号<code>&lt;something&gt;</code>会被文本默认为HTML标签语句而不予显示。<ul><li>使用转义字符<code>&amp;lt;</code>代替<code>&lt;</code>，用<code>&amp;gt;</code>代替<code>&gt;</code></li><li>或者右闭合的尖括号前加一个转义符号<code>\</code>，例如：<code>&lt;something\&gt;</code><br><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=>start: 开始e=>end: 结束io1=>inputoutput: 输入聚类类数kop1=>operation: 筛选初始质心op2=>operation: 计算样本点到各个质心之间的距离并将其归到距离其最近的质心所在簇中op3=>operation: 计算各簇均值，生成新的质心c1=>condition: 新旧质心距离小于阈值io2=>inputoutput: 输出聚类结果st->io1->op1->op2->op3->c1c1(no)->op2c1(yes)->io2->e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script></li></ul></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 其他小结 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Markdown </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
