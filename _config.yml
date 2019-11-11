@@ -113,8 +113,8 @@ deploy:
     email: "837408039@qq.com"
     message: "clean node_modules {{now('YYYY-MM-DD')}}"
     extend_dirs: /
-    ignore_hidden: true
-    ignore_pattern:
+    ignore_hidden: false
+    ignore_pattern: # 应该是对隐藏文件进行匹配的
       public: .
 
 

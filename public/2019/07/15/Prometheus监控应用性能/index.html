@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能监控,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。">
+<meta name="keywords" content="性能监控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prometheus 监控应用性能">
+<meta property="og:url" content="http://yoursite.com/2019/07/15/Prometheus监控应用性能/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="&amp;emsp;&amp;emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2019/07/15/Prometheus监控应用性能/architecture.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/15/Prometheus监控应用性能/flowChart.png">
+<meta property="og:updated_time" content="2019-11-11T03:54:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Prometheus 监控应用性能">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/15/Prometheus监控应用性能/architecture.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/07/15/Prometheus监控应用性能/">
+
+
+
+
+
+  <title>Prometheus 监控应用性能 | Daily record</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Daily record</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">琐记随笔</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-book"></i> <br>
+            
+            书籍
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-movies">
+          <a href="/movies/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-film"></i> <br>
+            
+            电影
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-games">
+          <a href="/games/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gamepad"></i> <br>
+            
+            游戏
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/15/Prometheus监控应用性能/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Prometheus 监控应用性能</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-15T10:21:58+08:00">
+                2019-07-15 10:21:58
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2019-11-11T11:54:42+08:00">
+                2019-11-11 11:54:42
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端/" itemprop="url" rel="index">
+                    <span itemprop="name">后端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。<br><a id="more"></a></p>
+<h3 id="一、Prometheus-系统简介"><a href="#一、Prometheus-系统简介" class="headerlink" title="一、Prometheus 系统简介"></a>一、Prometheus 系统简介</h3><p><a href="https://prometheus.io/" target="_blank" rel="noopener">Prometheus</a> 是一个开源的服务监控系统，社区资源和开发者都很活跃。其主要原理是通过 HTTP 协议从远程的机器收集数据并存储在本地的<a href="https://www.cnblogs.com/aiandbigdata/p/10052335.html" target="_blank" rel="noopener">时序数据库</a>上。Prometheus 通过安装在远程机器上的 exporter (数据暴露)插件来收集监控数据。</p>
+<h4 id="Prometheus-特点"><a href="#Prometheus-特点" class="headerlink" title="Prometheus 特点"></a>Prometheus 特点</h4><p>Prometheus 本身也是一个时序数据库，它通过 HTTP 的方式获取时序数据。Prometheus 自身的查询语言 PromQL 可多维度的查询并实时计算指标的值。通过 PromQL 提供的计算方法，可以自定义数据可视化的指标，以及报警临界值。它有四种数据类型，可针对不同场景使用不同数据类型。</p>
+<h4 id="Prometheus-系统的组成部分"><a href="#Prometheus-系统的组成部分" class="headerlink" title="Prometheus 系统的组成部分"></a>Prometheus 系统的组成部分</h4><p><img src="/2019/07/15/Prometheus监控应用性能/architecture.png" alt="" title="Prometheus 架构"><br>在监控流程中，主要由三个部分组成：被监控的应用暴露性能指标(exporter)，promethues 应用采集性能指标(collector)，数据可视化分析界面(web UI)。详情参照下述：</p>
+<ol>
+<li>Prometheus server: 用于抓取数据，并存储到时序数据库;</li>
+<li>Prometheus exporter: 安装在监控目标的上，为 Prometheus server 提供数据抓取的接口;</li>
+<li>Prometheus web UI: 提供数据可视化分析界面;</li>
+<li>Alertmanager: 用于处理警报;</li>
+<li>Pushgateway: 用于 job 推送;</li>
+</ol>
+<h3 id="二、Prometheus-监控流程图"><a href="#二、Prometheus-监控流程图" class="headerlink" title="二、Prometheus 监控流程图"></a>二、Prometheus 监控流程图</h3><p><img src="/2019/07/15/Prometheus监控应用性能/flowChart.png" alt="" title="Prometheus flow chart"></p>
+<h4 id="Promethues-server"><a href="#Promethues-server" class="headerlink" title="Promethues server"></a>Promethues server</h4><p>主要负责数据采集和存储，提供 PromQL 查询语言的支持。可以通过 Prometheus 的 <code>.yml</code>文件中的<code>scrape_config</code> <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config" target="_blank" rel="noopener">(字段详情)</a>来配置要抓取的应用指标地址。同时，Promethues 也会监控自身的健康情况，默认将指标暴露在自身的 <code>http://localhost:9090/metrics</code>。</p>
+<h4 id="Promethues-exporter"><a href="#Promethues-exporter" class="headerlink" title="Promethues exporter"></a>Promethues exporter</h4><p>参照<a href="https://prometheus.io/docs/instrumenting/clientlibs/" target="_blank" rel="noopener">官方推荐的插件列表</a>，由于本次监听的站点是 NodeJS 站点，所以选择 <a href="https://github.com/siimon/prom-client" target="_blank" rel="noopener">prom-client</a> 作为 exporter。<br>注意：被监听的应用需要暴露指标接口供 server 抓取。</p>
+<h4 id="Prometheus-web-UI"><a href="#Prometheus-web-UI" class="headerlink" title="Prometheus web UI"></a>Prometheus web UI</h4><p>Grafana 可以连接多种类型的库，选择 Promethues 即可，默认监听 Promethues server 的9090<code>/metrics</code> 路径。</p>
+<h3 id="三、NodeJS-应用性能监控"><a href="#三、NodeJS-应用性能监控" class="headerlink" title="三、NodeJS 应用性能监控"></a>三、NodeJS 应用性能监控</h3><p>使用 <a href="https://github.com/siimon/prom-client" target="_blank" rel="noopener">prom-client</a> 和 <a href="https://github.com/SimenB/node-prometheus-gc-stats" target="_blank" rel="noopener">node-prometheus-gc-stats</a> 收集 NodeJS 的性能指标。</p>
+<ul>
+<li>prom-client：收集服务端性能指标</li>
+<li>node-prometheus-gc-stats：垃圾回收相关指标统计</li>
+</ul>
+<p>（prom-client 相当于一个exporter，将默认的指标暴露在 /metrics 接口，之后 Promethues service会根据 <code>.yml</code> 配置中的采集时间定期来这个接口采集数据信息，然后 web UI Grafana 再跟 Promethues server 进行同步）</p>
+<h4 id="prom-client-文档"><a href="#prom-client-文档" class="headerlink" title="prom-client 文档"></a>prom-client 文档</h4><p>一共支持四种数据格式：Histogram、Summary、Gauges 、Counters：</p>
+<ul>
+<li><strong>Histogram(柱状图)</strong>：统计数据的分布情况（比如 <code>Http_response_time</code> 的时间分布）</li>
+<li><strong>Summary(摘要)</strong>：主要用于表示一段时间内数据采样结果（请求持续的时间或响应大小）</li>
+<li><strong>Gauges(仪表盘)</strong>：最简单的度量指标，监测瞬间状态（监控硬盘容量或者内存的使用量）</li>
+<li><strong>Counters(计数器)</strong>：从数据量0开始累积计算，在理想状态下只能是永远的增长不会降低</li>
+</ul>
+<p>常用的采集方法：</p>
+<ul>
+<li>collectDefaultMetrics() 返回 Promethues 的默认推荐指标，默认10s探测一次</li>
+<li>AggregatorRegsitry 聚合注册器：监听集群的性能指标（主进程和其产生的子进程）<ul>
+<li>clusterMetrics() 返回默认指标</li>
+<li><a href="https://github.com/siimon/prom-client/issues/257" target="_blank" rel="noopener">抓取所有进程的 metrics 只能在主进程上抓取，在子进程上获取不到 metrics</a></li>
+</ul>
+</li>
+</ul>
+<p>收集到指标后，就可以利用 PromQL 进行计算了，计算时注意 PromQL <strong>即时向量</strong> 和 <strong>范围向量</strong> 两种向量的区别和转换：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 计算每分钟垃圾回收bytes数</span><br><span class="line">delta(nodejs_gc_reclaimed_bytes_total&#123;gctype=&quot;Scavenge&quot;&#125;[1m])</span><br><span class="line"></span><br><span class="line">// 计算个页面5min以内的DomReady均值</span><br><span class="line">delta(FE_Timing_Performance_domReady_sum[5m])/delta(FE_Timing_Performance_domReady_count[5m])</span><br></pre></td></tr></table></figure></p>
+<h4 id="※example-prometheus-nodejs"><a href="#※example-prometheus-nodejs" class="headerlink" title="※example-prometheus-nodejs"></a>※<a href="https://github.com/RisingStack/example-prometheus-nodejs" target="_blank" rel="noopener">example-prometheus-nodejs</a></h4><p>&emsp;&emsp; 这个 demo 是一个完整的 prom-client + Promethues + grafana 监控示例，有助于理解整个监控流程。</p>
+<h3 id="四、前端异常记录实践结论"><a href="#四、前端异常记录实践结论" class="headerlink" title="四、前端异常记录实践结论"></a>四、前端异常记录实践结论</h3><p><strong>并不推荐使用 Prometheus 系统来记录前端页面性能等信息。</strong></p>
+<ol>
+<li>从指标上来看，应用的基本性能指标：吞吐量、内存使用量、每秒请求数、请求平均耗时等。这些几乎都是“瞬时”值（由于时间窗口小，可看做瞬时值），而前端性能指标并不是“瞬时”，它更偏向于一段时间内的表现情况（时间窗口大）。Prometheus 系统主要用于监听应用的性能，它的数据类型更多是为应用服务。</li>
+</ol>
+<ul>
+<li>应用性能特点：一个应用，多个指标；</li>
+<li><a href="https://kuro-p.github.io/2019/07/11/前端性能监控-Performance/#more" target="_blank" rel="noopener">前端页面的性能指标</a>特点：一个页面，多个指标。多个页面。</li>
+</ul>
+<ol start="2">
+<li>从数据类型上来看：<ul>
+<li>Gauges：不可以用来记录前端的性能表现。因为 Gauge 记录的某一刻的瞬时值，如果用来记录时间，则每次数据都会被最后访问的那名用户刷新；</li>
+<li>Counter：计数器虽然可以记录前端某个页面的访问次数，但若页面路由中携带参数，或者结尾带时间戳，则会生成多个重复页面的 Counter，遇到爬虫还会生成大量无用路径，表现并不好；</li>
+<li>Histogram、Summary：可以记录多个页面，多个指标；Histogram 和 Summary 很相似，只不过 Histogram 记录原始值，Summary 记录指标的各个占比。</li>
+</ul>
+</li>
+<li>从可视化web UI上来看：<br>公司 Prometheus 系统默认使用的可视化UI是 Grafana。之前尝试用 Histogram 来记录前端各页面的性能表现，在 Grafana 中用折线图可视化数据。一个指标对应一个折线图，但由于页面路由多个，导致各个折线图中折线过多难以分辨；若取所有页面该指标的均值或者最大值来展示，又不知道峰值是哪个页面产生的。</li>
+</ol>
+<p><strong>综上可以看出，Prometheus 可以记录前端性能指标，但是受数据类型制约，它并不是最合适的。</strong></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a href="https://prometheus.io" target="_blank" rel="noopener">Prometheus 官网</a></li>
+<li><a href="https://blog.csdn.net/polo2044/article/details/83277299" target="_blank" rel="noopener">Prometheus 的数据类型介绍</a></li>
+<li><a href="https://www.colabug.com/227611.html" target="_blank" rel="noopener">prom-client 监控示例</a></li>
+<li><a href="https://www.cnblogs.com/aguncn/p/9920545.html" target="_blank" rel="noopener">如何区分 Prometheus 中 Histogram 和 Summary 类型的 metrics?</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能监控/" rel="tag"># 性能监控</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/11/前端性能监控-Performance/" rel="next" title="前端性能监控">
+                <i class="fa fa-chevron-left"></i> 前端性能监控
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/05/z-index小结/" rel="prev" title="z-index小结">
+                z-index小结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="Kuro-P">
+            
+              <p class="site-author-name" itemprop="name">Kuro-P</p>
+              <p class="site-description motion-element" itemprop="description">FE and more ...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/Kuro-P" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/about/" target="_blank" title="About">
+                      
+                        <i class="fa fa-fw fa-user"></i>About</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、Prometheus-系统简介"><span class="nav-number">1.</span> <span class="nav-text">一、Prometheus 系统简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Prometheus-特点"><span class="nav-number">1.1.</span> <span class="nav-text">Prometheus 特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Prometheus-系统的组成部分"><span class="nav-number">1.2.</span> <span class="nav-text">Prometheus 系统的组成部分</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、Prometheus-监控流程图"><span class="nav-number">2.</span> <span class="nav-text">二、Prometheus 监控流程图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Promethues-server"><span class="nav-number">2.1.</span> <span class="nav-text">Promethues server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Promethues-exporter"><span class="nav-number">2.2.</span> <span class="nav-text">Promethues exporter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Prometheus-web-UI"><span class="nav-number">2.3.</span> <span class="nav-text">Prometheus web UI</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、NodeJS-应用性能监控"><span class="nav-number">3.</span> <span class="nav-text">三、NodeJS 应用性能监控</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#prom-client-文档"><span class="nav-number">3.1.</span> <span class="nav-text">prom-client 文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#※example-prometheus-nodejs"><span class="nav-number">3.2.</span> <span class="nav-text">※example-prometheus-nodejs</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、前端异常记录实践结论"><span class="nav-number">4.</span> <span class="nav-text">四、前端异常记录实践结论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
