@@ -114,7 +114,7 @@ deploy:
     message: "clean node_modules {{now('YYYY-MM-DD')}}"
     extend_dirs: /
     ignore_hidden: false
-    ignore_pattern: # 应该是对隐藏文件进行匹配的
+    ignore_pattern: # 应该是对隐藏文件名进行匹配的
       public: .
 
 
