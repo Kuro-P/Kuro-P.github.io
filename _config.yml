@@ -116,6 +116,7 @@ deploy:
     ignore_hidden: true
     ignore_pattern:
       public: .
+      node_modules: .
 
 
 
