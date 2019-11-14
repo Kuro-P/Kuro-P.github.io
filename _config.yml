@@ -99,30 +99,9 @@ search:
 # Docs: https://hexo.io/docs/deployment.html
 # hexo-deployer-git: https://github.com/hexojs/hexo-deployer-git
 deploy:
-<<<<<<< HEAD
-=======
   - type: git
     repo: https://github.com/Kuro-P/Kuro-P.github.io.git
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "uodate hexo-deployer-git 小结 page"
- 
->>>>>>> b61428312dcf3181af261594b01f5ea7ea7e85cb
-  - type: git
-    repo: https://github.com/Kuro-P/Kuro-P.github.io.git
-    branch: master
-    name: "Kuro-P"
-    email: "837408039@qq.com"
-<<<<<<< HEAD
-    message: "uodate hexo-deployer-git 小结 page"
-=======
-    message: "update readme {{now('YYYY-MM-DD')}}"
-    extend_dirs: /
-    ignore_hidden: false
-    ignore_pattern:
-      public: .
-
-
-
->>>>>>> b61428312dcf3181af261594b01f5ea7ea7e85cb
+    message: "update hexo-deployer-git 小结 page"

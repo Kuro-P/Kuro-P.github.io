@@ -1,6 +1,6 @@
 # hexo build (master)
-# hexo g
-# hexo deploy
+hexo g
+hexo deploy
 
 # git commit (develop)
 git status
