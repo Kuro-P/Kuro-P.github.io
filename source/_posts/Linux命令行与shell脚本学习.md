@@ -59,10 +59,12 @@ categories: 计算机相关知识
 * grep match_pattern <fileName\> 强大的文本搜索工具，可以使用正则表达式搜索文本，并显示出匹配的行数
 * ls -l <fileName\> 查看文件权限
 * chmod value <fileName\> 更改文件权限
-  * 权限描述顺序依次是：Owner、Group、Other
+  * 权限描述顺序依次是：Owner(User)、Group、Other
   * r=读取属性 //值=4
   * w=写入属性 //值=2
   * x=执行属性 //值=1
+* chown(选项)(参数) 更改文件夹所有者和所属组
+  * chown -R user:group .git 将.git文件夹的权限设置为 group 下的 user
 
 ### 监控进程
 * ps 显示进程信息（瞬间占用情况）
@@ -76,7 +78,7 @@ categories: 计算机相关知识
 * dig <url\> 域名查询工具，可以用来测试域名系统工作是否正常
 * nsloopup <url\> 域名查询工具，查询 DNS 相关信息
 
-### 变量
+### 环境变量
 * printenv/env 默认输出所有环境变量（全局）
     * printenv JAVA_HOME 输出全局设置的JAVA SDK位置
     * env $JAVA_HOME 

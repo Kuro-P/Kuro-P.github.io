@@ -1,6 +1,6 @@
 # hexo build (master)
 hexo g
-hexo deploy
+sudo hexo deploy
 
 # git commit (develop)
 git status
@@ -10,7 +10,7 @@ if [ $confirm == "Y" ]
 then 
     echo "Start commiting files to github"
     git add .
-    git commit -m $message
+    git commit -m "$message"
     git push
 else
     echo "Develop files reserve abort."    
