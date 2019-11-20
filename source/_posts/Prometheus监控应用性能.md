@@ -2,7 +2,7 @@
 title: Prometheus 监控应用性能
 date: 2019-07-15 10:21:58
 tags: [性能监控]
-categories: 后端
+categories: 监控
 ---
 &emsp;&emsp; Prometheus 是一个开源的监控系统。它可以自动化的监听应用各性能指标的变化情况，并发出报警信息。了解它目的，是想把前端页面的性能指标记录到公司的 Prometheus 监控系统上，利用它监听前端页面各类异常。
 <!--more-->

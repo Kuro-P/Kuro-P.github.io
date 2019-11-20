@@ -104,4 +104,4 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "update hexo-deployer-git 小结 page"
+    message: "Flink-初探"
