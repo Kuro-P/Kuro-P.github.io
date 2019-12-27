@@ -39,8 +39,16 @@ categories: 计算机相关知识
     * -f 强制删除，没有警告信息也没有声音提示
     * -r 递归删除目录及目录内所有文件  
     * __注意：Linux 中没有回收站或垃圾箱，文件一旦删除，就无法再找回__
+* ls -l <fileName\> 查看文件权限
+* chmod value <fileName\> 更改文件权限
+  * 权限描述顺序依次是：Owner(User)、Group、Other
+  * r=读取属性 //值=4
+  * w=写入属性 //值=2
+  * x=执行属性 //值=1
+* chown(选项)(参数) 更改文件夹所有者和所属组
+  * chown -R user:group .git 将.git文件夹的权限设置为 group 下的 user
   
-### 文件信息操作
+### 文件内容操作
 * file <fileName/directoryName\> 查看文件类型信息
 * du <fileName/directoryName\> 用来查看文件或目录所占用的磁盘空间的大小
     * -h 以易于阅读的方式展示
@@ -57,14 +65,10 @@ categories: 计算机相关知识
     * head 默认展示文件前10行内容
         * 不支持 -f 属性
 * grep match_pattern <fileName\> 强大的文本搜索工具，可以使用正则表达式搜索文本，并显示出匹配的行数
-* ls -l <fileName\> 查看文件权限
-* chmod value <fileName\> 更改文件权限
-  * 权限描述顺序依次是：Owner(User)、Group、Other
-  * r=读取属性 //值=4
-  * w=写入属性 //值=2
-  * x=执行属性 //值=1
-* chown(选项)(参数) 更改文件夹所有者和所属组
-  * chown -R user:group .git 将.git文件夹的权限设置为 group 下的 user
+* sed -i 's/被替换的内容/要替换的内容/g' file  -i 表示直接修改并保存
+    * [使用 sed 命令，报错`invalid command code`](https://blog.csdn.net/u010339879/article/details/90107977)，是因为 -i 原地替换是危险行为，需要指明一个备份的扩展名才可以，若给了空的扩展名，则不会备份源文件。
+    * 如 sed -i '' 's/被替换的内容/要替换的内容/g' file
+
 
 ### 监控进程
 * ps 显示进程信息（瞬间占用情况）
@@ -78,7 +82,8 @@ categories: 计算机相关知识
 * dig <url\> 域名查询工具，可以用来测试域名系统工作是否正常
 * nsloopup <url\> 域名查询工具，查询 DNS 相关信息
 
-### 环境变量
+### 变量
+#### 环境变量
 * printenv/env 默认输出所有环境变量（全局）
     * printenv JAVA_HOME 输出全局设置的JAVA SDK位置
     * env $JAVA_HOME 
@@ -86,9 +91,10 @@ categories: 计算机相关知识
 * echo $variableName 输出变量 ($用来表名它是个变量)
 * set 输出所有环境变量（全局和局部）
 * $HOME 表示的用户的主目录，与波浪线`~`作用一样
-* __注意：所有的环境变量名均使用大写字母，若是自己创建的局部变量或是shell脚本，则用小写字母，变量名区分大小写。__
-* __赋值时，变量名、等号和值之间没有空格__
-* __若要给变量赋值一个含空格的字符串，则需要用单引号括起来__
+
+#### 普通变量
+声明时直接声明即可使用`variable=XXX`，变量名区分大小写，但需要注意的是 __赋值时，变量名、等号和值之间没有空格__ 否则会报错`command not found`。
+常用的书写习惯是 __所有的环境变量名均使用大写字母，若是自己创建的局部变量或是shell脚本，则用小写字母，变量名区分大小写。__
 
 ### vim 操作
 * vim <fileName\> 以 vim 编辑器的方式查看当前文件
@@ -96,9 +102,14 @@ categories: 计算机相关知识
 * 按 `esc` 退出当前编辑模式
 * 输入 `:` 切换到底线命令模式，可以在最底行输入其他命令
 * 输入 `!wq` ，保存并退出；输入 `!q`，不保存直接退出
-* .swp 文件: 非正常关闭的 vim 编辑器会生成一个 .swp 文件 
+* .swp 文件: 非正常关闭的 vim 编辑器会生成一个 .swp 文件
 
-### 其他
+### 杂项
+#### 大小写转换
+* echo $VAR_NAME | tr '[:upper:]' '[:lower:]'
+* echo $VAR_NAME | tr '[A-Z]' '[a-z]'
+
+#### 其他
 * alias 可用来查看当前可用的别名(内建命令)
   * alias 新的命令='原命令 -选项/参数' 用来定义命令别名
 * sh <fileName.sh\> 执行shell文件
@@ -124,3 +135,4 @@ categories: 计算机相关知识
 __其他参考:__
 * __[Linux命令大全](http://man.linuxde.net/)__
 * __[Linux命令英文缩写的含义](http://blog.chinaunix.net/uid-27164517-id-3299073.html)__
+* __[Shell基础](http://c.biancheng.net/shell/base/)__

@@ -15,7 +15,6 @@ then
     CONFIG_URL="_config.yml"
     if [ -f ${CONFIG_URL} ]
         then
-            echo "Start "
             sed -i "" "s/commit_message/$message/g" ${CONFIG_URL}
             # hexo build (master)
             hexo g
