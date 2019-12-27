@@ -109,7 +109,7 @@ categories: 计算机相关知识
 * echo $VAR_NAME | tr '[:upper:]' '[:lower:]'
 * echo $VAR_NAME | tr '[A-Z]' '[a-z]'
 
-#### 其他
+### 其他
 * alias 可用来查看当前可用的别名(内建命令)
   * alias 新的命令='原命令 -选项/参数' 用来定义命令别名
 * sh <fileName.sh\> 执行shell文件

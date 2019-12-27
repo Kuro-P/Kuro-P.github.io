@@ -1,10 +1,10 @@
 ---
-title: PWA-Service Workeer 小结（一）缓存篇
+title: PWA-Service Worker 小结（一）缓存篇
 date: 2019-12-26 16:39:55
 tags: [Service Worker]
 categories: [前端, PWA]
 ---
-年底了，总结一下上半年探索的 PWA 的离线缓存技术。顺带总结了一下前端全流程每一步中都可能遇到的缓存，大部分都是概念、名词的理解和说明。涉及到的缓存有：HTTP 缓存、Manifest 缓存、CDN 缓存、Nginx 服务器缓存、Service Workerr 缓存。
+年底了，总结一下上半年探索的 PWA 的离线缓存技术。顺带总结了一下前端全流程每一步中都可能遇到的缓存，大部分都是概念、名词的理解和说明。涉及到的缓存有：HTTP 缓存、Manifest 缓存、CDN 缓存、Nginx 服务器缓存、Service Worker 缓存。
 
 <!--more-->
 
