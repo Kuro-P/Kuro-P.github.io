@@ -1,5 +1,5 @@
 ---
-title: PWA-Service Worker 小结（一）缓存篇
+title: PWA-Service Worker 小结（一）各类缓存对比
 date: 2019-12-26 16:39:55
 tags: [Service Worker]
 categories: [前端, PWA]
@@ -24,7 +24,9 @@ categories: [前端, PWA]
       * max-age=<seconds> 设置缓存存储的最大周期，超过这个时间缓存被认为过期(单位秒)；标准中规定 max-age 的值最大不能超过一年，且以秒为单位，所以值为 31536000；
       * no-cache  字面意义“不缓存”。实际机制是对资源仍使用缓存，但每次使用前必须（MUST）向服务器对缓存资源进行验证；
       * no-store 不使用任何缓存；
-3. __验证机制__：服务器返回资源的时候有时会在头信息中携带 Etag（Entity Tag），它可作为浏览器再次请求过程的校验标识。如发现校验标识不匹配，说明资源已经修改或过期，浏览器需要重新获取资源内容。若使用了模板引擎，有时会自带 Etag 来检查当前资源是否需要更新。
+3. __验证机制__：服务器返回资源的时候有时会在头信息中携带 __Etag（Entity Tag）__，它可作为浏览器再次请求过程的校验标识。如发现校验标识不匹配，说明资源已经修改或过期，浏览器需要重新获取资源内容。
+ETag 可以保证每一个资源是唯一的，资源变化都会导致 ETag 变化。服务器根据浏览器上送的 ETag / If-None-Match 值来判断是否命中缓存。在精准度上，Etag 优于 Last-Modified。因为 Etag 是按照内容为资源增加标识，而 Last-Modified 是根据文件最后修改时间判断。
+![](/协商缓存命中过程.png "协商缓存命中过程")
 
 #### 常用的缓存策略：
 * 对于动态生成的 HTML 页面使用 HTTP 头: Cache-Control : no-cache;
@@ -89,6 +91,8 @@ Service Worker -> HTTP 缓存 -> CDN 缓存 (-> Nginx 缓存) -> 源站
 ### 参考资料：
 * 《web全栈工程师的自我修养》
 * [由memoryCache和diskCache产生的浏览器缓存机制的思考](https://segmentfault.com/a/1190000011286027)
+* [HTTP强缓存和协商缓存](https://segmentfault.com/a/1190000008956069)
+* [Etag和Last-Modified](https://www.jianshu.com/p/b5c805f4e8d1)
 * [傻傻分不清的Manifest](https://segmentfault.com/a/1190000019395237?utm_source=tag-newest)
 * [定制修改gulp-rev返回的rev-manifest.json文件](https://blog.csdn.net/wangjun5159/article/details/79287881)
 * [从HTTP响应头看各家CDN缓存技术](https://segmentfault.com/a/1190000006673084)
