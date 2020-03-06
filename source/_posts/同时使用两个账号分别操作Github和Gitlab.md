@@ -10,22 +10,25 @@ categories: git
 分别对githubn和gitlab生成对应的密钥
 * 用`ssh-keygen -t rsa -C "公司邮箱地址"`生成对应的gitlab密钥：id_rsa和id_rsa.pub
 * 将 gitlab 公钥(id_rsa.pub)中的内容配置到公司的gitlab上
-* 用`ssh-keygen -t rsa -C "自己邮箱地址" -f ~/.ssh/github_rsa`生成对应的github密钥：github_rsa和github_rsa.pub
+* 用`ssh-keygen -t rsa -C "自己邮箱地址" -f ~/.ssh/github_rsa`生成对应的github密钥：github_rsa 和 github_rsa.pub
+* 生成公私钥的过程中，会提示你输入`passphrase`，用作每次进行 ssh 连接时的确认密码。由于电脑和账号都是个人使用所以直接按回车设置为空就可以了
+![设置 passphrase](/enter-passphrase.png)
 * 将 github 公钥(github_rsa.pub)中的内容配置到自己的github上
+* 到目前为止本地 ~/.ssh 中已经存在 github_rsa、github_rsa.pub、id_rsa、id_rsa.pub 四个文件了，由于 github 和 gitlab 建立连接默认查找的都是~/.ssh/id_rsa，所以需要为 github 手动指明使用的私钥名称 github_rsa，否则会报错 <span style="color: #c7254e; background: #f2f2f2"> Permission denied (publickey) </span>
 * 进入密钥生成的位置，创建一个 config 文件，添加配置：
 ````
     # githab
     Host github.com
         HostName github.com
+        User kuro-p
         IdentityFile ~/.ssh/github_rsa
 ````
-注意：这里不配置 config 文件的话，测试与 github 的连接会报错 Permission denied (publickey) ，因为 github 默认查找的是~/.ssh/id_rsa。
 ### 二、测试连接
 运行`ssh -T git@hostName`命令测试 ssh key 对 gitlab 与 github的连接
 ![测试连接是否正常](/test-ssh-connect.png)
 如果能看到一些 Welcome 信息，说明是 OK 的。
-### 三、配置 git 库
-由于全局配置是公司的账号，所以只需要对自己想要进行操作的 github 库进行本地配置即可。
+### 三、配置 git 库账号
+为了使 github / gitlab 知道提交的用户是谁，需要对账户名进行配置。由于全局配置是公司的账号，所以只需要对自己想要进行操作的 github 库进行本地配置即可。
 ````
     git config --local user.name 'username' # github账号名称
     git config --local user.email 'username@gmail.com' # github账号邮箱

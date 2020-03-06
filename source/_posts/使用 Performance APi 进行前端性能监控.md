@@ -1,5 +1,5 @@
 ---
-title: 前端性能监控
+title: 使用 Performance APi 进行前端性能监控
 date: 2019-07-11 18:55:59
 tags: [性能监控]
 categories: [前端]
@@ -62,7 +62,22 @@ timing 对象提供了各种与浏览器处理相关的时间数据([详细](htt
 &emsp;&emsp;浏览器获取网页时，会对网页中每一个对象（脚本文件、样式表、图片文件等等）发出一个HTTP请求。performance.getEntries方法以数组形式，返回这些请求的时间统计信息，有多少个请求，返回数组就会有多少个成员。
 
 ### 数据埋点及上报方式
+
+#### 利用<script\>标签的 src 属性上报
 &emsp;&emsp;工作中采用的埋点方式是脚本引入。该脚本负责收集浏览器性能指标信息，并生成一个 <script\> 节点，将指标信息拼接成 url param 的形式，通过 <script\> 标签的 src 属性发起请求，将数据上报到服务器。
+
+#### 利用<img\>标签的 src 属性上报
+&emsp;&emsp;谷歌和百度的都是用的1x1 像素的透明 gif 图片，其优点如下：
+* 跨域友好
+* 执行过程无阻塞
+* 使用image时，部分浏览器内页面关闭不会影响数据上报
+* gif 的最低合法体积最小（最小的 bmp 文件需要74个字节，png 需要67个字节，而合法的 gif，只需要43个字节）
+  
+#### 利用 HTML5 Beacon API 进行数据上报
+Beacon API 允许开发者发送少量错误分析和上报的信息，它的特点很明显：
+* 在空闲的时候异步发送统计，不影响页面诸如 JS、CSS Animation 等执行
+* 即使页面在 unload 状态下，也会异步发送统计，不影响页面过渡/跳转到下跳页
+* 能够被客户端优化发送，尤其在 Mobile 环境下，可以将 Beacon 请求合并到其他请求上，一同处理
 
 ### 前端性能监控系统
 &emsp;&emsp;在github上发现的比较好的参考工具：
@@ -73,3 +88,4 @@ timing 对象提供了各种与浏览器处理相关的时间数据([详细](htt
 [前端性能监控-window.performance](https://blog.csdn.net/weixin_42284354/article/details/80416157)
 [Performance API-ruanyifeng](http://javascript.ruanyifeng.com/bom/performance.html)
 [初探Performance API](https://segmentfault.com/a/1190000014479800)
+[前端全（无）埋点之页面停留时长统计](https://juejin.im/entry/5a179332f265da431b6ce39c)

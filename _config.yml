@@ -104,4 +104,10 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "commit_message"
+    message: ""
+
+# deploy:
+#   - type: git
+#     repo: git@-:/var/repo/blog.git
+#     branch: master
+#     message: "update"
