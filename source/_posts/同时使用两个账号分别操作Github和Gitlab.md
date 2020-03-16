@@ -4,7 +4,7 @@ date: 2018-11-17 14:06:50
 tags: [git]
 categories: git
 ---
-公司用 gitlab 存管代码，自己用 github 。懒得下班后用自己电脑提交到 github ，故学习一下如何在同一台电脑上使用两个 git 账号。在 SSH config 中为不同的域名指定不同的SSH key，之后再将自己本地的 github 库的 git config -- local 设置成自己的 github 账号。
+公司用 gitlab 存管代码，自己用 github 。懒得下班后用自己电脑提交到 github ，故学习一下如何在同一台电脑上使用两个 git 账号。在 SSH config 中为不同的域名指定不同的 SSH key，之后再将自己本地的 github 库的 git config -- local 设置成自己的 github 账号。
 <!--more-->
 ### 一、生成SSH秘钥
 分别对githubn和gitlab生成对应的密钥

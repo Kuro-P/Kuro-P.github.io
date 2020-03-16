@@ -27,6 +27,7 @@ Hexo官网提供了一些主题  [https://hexo.io/themes/ ](https://hexo.io/them
 * 设置代码高亮样式 更改主题 _condig.yml 里的 hightlight_theme
 * 切换Hexo语言 在全局 _condig.yml 里的 language 改成 zh-Hans 即为主题下的简体中文（默认为英文）
 * (更换完主题，需要重启应用，方能生效)
+* __由于主题也是一个git仓库，下载后记得删除.git文件，否则主题文件是无法提交的__
   
 ### 生成文章
 ````
