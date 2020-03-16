@@ -110,4 +110,4 @@ deploy:
 #   - type: git
 #     repo: git@-:/var/repo/blog.git
 #     branch: master
-#     message: "update"
+#     message: "commit_message"
