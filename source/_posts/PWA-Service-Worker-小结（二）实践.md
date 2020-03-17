@@ -77,8 +77,22 @@ gulp.task('generate-service-worker', function(callback) {
 });
 ````
 
-### 四、Service Worker 的更新
-不要更改 service worker 的注册名称
+### 四、Service Worker.js 注意事项
+1. __不要给 service-worker.js 设置不同的名字__
+实际开发过程中，为了避免静态资源缓存，通常的做法是在打包压缩静态资源的时候，在文件名后边加上 MD5 后缀，让浏览器认为这是一个新文件从而重新发起请求，但是这种做法在 service-worker.js 上是不可取的；
+第一种情况：如果缓存了 html 文件，service-worker.js 的文件因为是在 html 中引入的，所以更改 service-worker.js 的名字并不会更新。
+第二种情况：只缓存了css，js 文件，未缓存 html 文件；页面引入了新的 service-worker.js ，但是旧版本的 service-worker.js 还在使用中，会导致页面状态有问题。
+2. __不要给 service-worker.js 设置缓存__
+理由和第一点类似，也是为了防止在浏览器需要请求新版本的 sw 时，因为缓存的干扰而无法实现。毕竟我们不能要求用户去清除缓存。因此给 sw 及相关的 JS (例如 sw-register.js，如果独立出来的话)设置 Cache-control: no-store 是比较安全的。
+
+### 五、遇到的问题
+1. __接收不到浏览器的fetch事件：__
+原因：静态资源缓存：页面路径不能大于 Service worker 的 scope ([详情](https://juejin.im/post/5b06a7b3f265da0dd8567513#heading-8))
+2. __`public/*` 无法匹配public路径下的所有文件， addCaches 时只能写fileName？__
+原因：service worker 没有通配符 * 这个概念，`/sw-test/` 这个 path 只是让 sw 寻找缓存时的一个入口，用以区分各个路径的缓存（[详情](https://stackoverflow.com/questions/46830493/is-there-any-way-to-cache-all-files-of-defined-folder-path-in-service-worker)）；
+解决方案：service-worker.js 使用官方的 `sw-precache` 插件生成（[详情](https://stackoverflow.com/questions/46208326/for-serviceworker-cache-addall-how-do-the-urls-work/46213137#46213137)）；
+3. __如果 service worker 缓存的了全部的js和img 会不会导致 cacheStorage 很占用用户的系统空间？__
+不会，各个浏览器分配给各站点的 cacheStorrage 的值不一样，同时也受用户设备空间影响。
 
 ### 落地情况
 个人觉得 Service Worker 更适合在单页应用、文档类应用的等场景使用，才能把离线缓存的优势发挥出来。比如 [Vue](https://cn.vuejs.org/) 的官网。<hr/>
@@ -105,3 +119,4 @@ gulp.task('generate-service-worker', function(callback) {
 * [Service Worker ——这应该是一个挺全面的整理](https://juejin.im/post/5b06a7b3f265da0dd8567513#heading-1)
 * [【PWA学习与实践】(9)生产环境中PWA实践的问题与解决方案](https://www.jianshu.com/p/7eae75f46467)
 * [谨慎处理 Service Worker 的更新](https://zhuanlan.zhihu.com/p/51118741)
+* [使用 Service Worker 做一个 PWA 离线网页应用](https://www.sohu.com/a/197477344_463987)
