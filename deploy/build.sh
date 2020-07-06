@@ -17,8 +17,8 @@ then
         then
             sed -i "" "s/commit_message/$message/g" ${CONFIG_URL}
             # hexo build (master)
-            hexo g
-            sudo hexo deploy
+            npx hexo g
+            npx hexo deploy
             sed -i "" "s/$message/commit_message/g" ${CONFIG_URL}
     fi        
 
