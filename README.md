@@ -21,4 +21,4 @@ __Develop on MacOS:__
 
 Problems:
 
-Add .gitattributes file to fix warning  `LF will be replaced by CRLF` 
+* git warning  `LF will be replaced by CRLF` 
