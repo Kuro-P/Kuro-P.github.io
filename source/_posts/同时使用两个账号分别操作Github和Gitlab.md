@@ -23,6 +23,7 @@ categories: git
         User kuro-p
         IdentityFile ~/.ssh/github_rsa
 ````
+* 如果为 github 中配置了两个 ssh，那么在 config 中，谁在前谁生效
 ### 二、测试连接
 运行`ssh -T git@hostName`命令测试 ssh key 对 gitlab 与 github的连接
 ![测试连接是否正常](/test-ssh-connect.png)
