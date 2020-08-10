@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "update:【译】ES2016-ES2020新特性"
+    message: "update: ECMA 标准"
 
   - type: git
     repo: git@ip:/var/repo/blog.git
     branch: master
-    message: "update:【译】ES2016-ES2020新特性"
+    message: "update: ECMA 标准"
