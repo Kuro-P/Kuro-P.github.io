@@ -117,17 +117,31 @@ categories: 计算机相关知识
 * .xxxrc 可以看做是xxx启动运行时的配置文件
     * 例如 .zshrc 就是 zsh 运行前要执行配置文件
 * source <fileName\> 或者 . <fileName\> (bash内部命令) 加载文件
+* 文件\包查找
+  * which <fileName\> 查找该包编译器所在位置
+  * whereis <fileName\> 搜索更大范围的系统目录并输出所有包含的路径
+  * find <fileName\> 查找系统是否安装了某个软件包
 
 ### 常用的配置文件地址
 * Host文件 /etc/hosts
 * 配置的SSH Key: cat ~/.ssh/id_rsa.pub
+
+### 常见文件颜色
+* 白色：表示普通文件
+* 蓝色：表示目录
+* 绿色：表示可执行文件
+* 红色：表示压缩文件
+* 浅蓝色：链接文件
+* 红色闪烁：表示链接的文件有问题
+* 黄色：表示设备文件
+* 灰色：表示其他文件
 
 ### 插件
 * homebrew 包管理器
     * brew install <packageName\> 安装插件
     * brew list 查看电脑安装了哪些插件
 * wget 下载网页常用的工具
-* curl 模拟htpp请求，类似于 POSTMAN
+* curl 模拟 http 请求，类似于 POSTMAN
     * curl <url\> 直接返回 url 请求结果
 * tree 以树状图形式展示目录及其子文件
     * tree <directory\> -J 以 json 形式展示文件

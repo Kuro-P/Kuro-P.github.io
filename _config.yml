@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "update: ECMA 标准"
+    message: "update: Note of linux"
 
   - type: git
     repo: git@ip:/var/repo/blog.git
     branch: master
-    message: "update: ECMA 标准"
+    message: "update: Note of linux"
