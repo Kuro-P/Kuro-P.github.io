@@ -3,14 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.8.0"
+    "version": "3.9.0"
   },
   "scripts": {
     "deploy": "sh deploy/build.sh",
     "start": "hexo server"
   },
   "dependencies": {
-    "hexo": "^3.8.0",
+    "g": "^2.0.1",
+    "hexo": "^3.9.0",
     "hexo-asset-image": "0.0.3",
     "hexo-deployer-git": "^0.3.1",
     "hexo-douban": "^1.1.3",

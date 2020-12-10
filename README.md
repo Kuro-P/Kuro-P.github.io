@@ -11,10 +11,12 @@ Use `npm run deploy` to deploy both of these things to the branch.<br/>
 
 ### 2020.7.9
 __Develop on Windows:__
-* Use `hexo g` to generate html files.
-* Use `hexo deploy` to deploy your files on Github Pages & Private server. And don't forget to change your server ip in `_config.yml` before deploy.
-* Then commit files to `develop` branch.
-* ( .sh file have too many errors on Windows )
+1. Use `hexo g` to generate html files.
+2. Use `hexo douban` to fetch data on Douban. 
+3. Use `hexo deploy` to deploy your files on Github Pages & Private server. And don't forget to change your server ip in `_config.yml` before deploy.
+4. Then commit files to `develop` branch.
+
+ps:  .sh file have too many errors on Windows 
 
 __Develop on MacOS:__
 * Use `npm run deploy` to deploy and commit files to master and develop branch.
