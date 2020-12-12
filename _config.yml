@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "update: Note of linux"
+    message: "Add: Can NodeJS use ES6 import syntax"
 
   - type: git
-    repo: git@ip:/var/repo/blog.git
+    repo: aly:/var/repo/blog.git
     branch: master
-    message: "update: Note of linux"
+    message: "Add: Can NodeJS use ES6 import syntax"

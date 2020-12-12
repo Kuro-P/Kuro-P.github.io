@@ -48,6 +48,7 @@ categories: 计算机相关知识
   ![文件权限](/file-permissions.png)
 * chown(选项)(参数) 更改文件夹所有者和所属组
   * chown -R user:group .git 将.git文件夹的权限设置为 group 下的 user
+* 获取文件路径：直接将文件拖入命令行即可
   
 ### 文件内容操作
 * file <fileName/directoryName\> 查看文件类型信息
@@ -69,6 +70,7 @@ categories: 计算机相关知识
 * sed -i 's/被替换的内容/要替换的内容/g' file  -i 表示直接修改并保存
     * [使用 sed 命令，报错`invalid command code`](https://blog.csdn.net/u010339879/article/details/90107977)，是因为 -i 原地替换是危险行为，需要指明一个备份的扩展名才可以，若给了空的扩展名，则不会备份源文件。
     * 如 sed -i '' 's/被替换的内容/要替换的内容/g' file
+* ls -> xxx.txt 将命令输出的内容保存为文件
 
 
 ### 监控进程

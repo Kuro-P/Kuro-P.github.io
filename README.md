@@ -16,7 +16,7 @@ __Develop on Windows:__
 3. Use `hexo deploy` to deploy your files on Github Pages & Private server. And don't forget to change your server ip in `_config.yml` before deploy.
 4. Then commit files to `develop` branch.
 
-ps:  .sh file have too many errors on Windows 
+PS: .sh file have too many errors on Windows 
 
 __Develop on MacOS:__
 * Use `npm run deploy` to deploy and commit files to master and develop branch.
