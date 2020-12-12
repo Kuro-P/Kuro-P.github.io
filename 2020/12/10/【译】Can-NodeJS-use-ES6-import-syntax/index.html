@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="NodeJS,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇文章，这里不再赘述。 （ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）">
+<meta name="keywords" content="NodeJS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】Can NodeJS use ES6 import syntax ?">
+<meta property="og:url" content="http://yoursite.com/2020/12/10/【译】Can-NodeJS-use-ES6-import-syntax/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇文章，这里不再赘述。 （ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-12-12T06:27:20.329Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】Can NodeJS use ES6 import syntax ?">
+<meta name="twitter:description" content="偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇文章，这里不再赘述。 （ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/12/10/【译】Can-NodeJS-use-ES6-import-syntax/">
+
+
+
+
+
+  <title>【译】Can NodeJS use ES6 import syntax ? | Daily record</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Daily record</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">琐记随笔</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-book"></i> <br>
+            
+            书籍
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-movies">
+          <a href="/movies/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-film"></i> <br>
+            
+            电影
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-games">
+          <a href="/games/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gamepad"></i> <br>
+            
+            游戏
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/10/【译】Can-NodeJS-use-ES6-import-syntax/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【译】Can NodeJS use ES6 import syntax ?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-12-10T20:36:12+08:00">
+                2020-12-10 20:36:12
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-12-12T14:27:20+08:00">
+                2020-12-12 14:27:20
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端/" itemprop="url" rel="index">
+                    <span itemprop="name">后端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇<a href="/2019/01/03/前端模块化/#more">文章</a>，这里不再赘述。</p>
+<p>（ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）<br><a id="more"></a></p>
+<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>本文主要内容：</p>
+<ul>
+<li>Node 对 ES Modules 的支持</li>
+<li>在 Node 使用 import 语法</li>
+<li>Node 中 ES Modules 的现状和未来</li>
+</ul>
+<h2 id="Node-对-ES-Modules-支持"><a href="#Node-对-ES-Modules-支持" class="headerlink" title="Node 对 ES Modules 支持"></a>Node 对 ES Modules 支持</h2><p>Node 13.2.0 开始正式支持 ES Modules 特性（移除了 –experimental-modules 启动参数）.</p>
+<p>注意：相关的 ESM 的实验性标志都虽然被移除<br>（但是由于 ESM loader 还是实验性的，所以运行 ES Modules 代码依然会有警告：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(node:47324) ExperimentalWarning: The ESM module loader is experimental.</span><br></pre></td></tr></table></figure></p>
+<h2 id="在-NodeJS-中使用-ES-Modules"><a href="#在-NodeJS-中使用-ES-Modules" class="headerlink" title="在 NodeJS 中使用 ES Modules"></a>在 NodeJS 中使用 ES Modules</h2><p>使 Node 支持 ES modules 有两种方式：</p>
+<ol>
+<li>在 package.json中，增加 <code>type: &quot;module&quot;</code>配置，即可在 node 代码中使用 <code>import</code>和<code>export</code>语法:</li>
+</ol>
+<p>文件目录结构：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── index.js</span><br><span class="line">├── package.json</span><br><span class="line">└── utils</span><br><span class="line">    └── speak.js</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// utils/speak.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">speak</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Come from speak.'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; speak &#125; <span class="keyword">from</span> <span class="string">'./utils/speak.js'</span>;</span><br><span class="line">speak(); <span class="comment">//come from speak</span></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>在 .mjs 文件中直接使用 <code>import</code>和<code>export</code>；</li>
+</ol>
+<p>文件目录结构：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── index.mjs</span><br><span class="line">├── package.json</span><br><span class="line">└── utils</span><br><span class="line">    └── sing.mjs</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// utils/sing.mjs</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">sing</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Come from sing'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.mjs</span></span><br><span class="line"><span class="keyword">import</span> &#123; sing &#125; <span class="keyword">from</span> <span class="string">'./utils/sing.mjs'</span>;</span><br><span class="line">sing(); <span class="comment">//come from sing</span></span><br></pre></td></tr></table></figure>
+<p>注意：</p>
+<ul>
+<li><p>若不添加上述两项中任一项，直接使用在 Node 中使用 ES modules，则会抛出警告：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Warning: To load an ES module, <span class="built_in">set</span> <span class="string">"type"</span>: <span class="string">"module"</span> <span class="keyword">in</span> the package.json or use the .mjs extension.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>根据ESM规范，使用import关键字并不会像 CommonJS 模块那样，在默认情况下以文件扩展名完成文件路径。因此，ES Modules 必须明确文件扩展名。</strong></p>
+</li>
+</ul>
+<h3 id="模块作用域"><a href="#模块作用域" class="headerlink" title="模块作用域"></a>模块作用域</h3><p>一个模块的作用域，由父级中有 <code>type: &quot;module&quot;</code> 的 package.json 文件路径定义。而使用<code>.mjs</code>扩展文件加载模块，则不受限于包的作用域。<br>同理，<code>package.json</code>中没有<code>type</code>标志的包都会默认采用 CommonJS 模块机制，<code>.cjs</code>类型的扩展文件使用 CommonJS 方式加载模块同样不受限于包的作用域。</p>
+<h3 id="包的入口"><a href="#包的入口" class="headerlink" title="包的入口"></a>包的入口</h3><p>定义包的入口有两种方式，在 package.json 中定义<code>main</code>字段或者<code>exports</code>字段<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"main"</span>: <span class="string">"./main.js"</span>,</span><br><span class="line">  <span class="string">"exports"</span>: <span class="string">"./main.js"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是，当<code>exports</code>字段被定义后，包的所有子路径都将被封装，子路径的文件不可再被导入。例如 require(‘pkg/subpath.js’) 将会报错：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERR_PACKAGE_PATH_NOT_EXPORTED error.</span><br></pre></td></tr></table></figure></p>
+<p>参考官方文档：<a href="https://nodejs.org/api/packages.html#packages_main_entry_point_export" target="_blank" rel="noopener">https://nodejs.org/api/packages.html#packages_main_entry_point_export</a></p>
+<h3 id="两个模块机制在执行时机上的区别"><a href="#两个模块机制在执行时机上的区别" class="headerlink" title="两个模块机制在执行时机上的区别"></a>两个模块机制在执行时机上的区别</h3><ul>
+<li>ES Modules 导入的模块会被预解析，以便在代码运行前导入：<ul>
+<li>根据 EMS 规范 import / export 必须位于模块顶级，不能位于作用域内；</li>
+<li>模块内的 import/export 会提升到模块顶部；</li>
+</ul>
+</li>
+<li>在 CommonJS 中，模块将在运行时解析；</li>
+</ul>
+<p>举一个简单的例子来直观的对比下二者的差别：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ES Modules</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// a.js</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Come from a.js.'</span>);</span><br><span class="line"><span class="keyword">import</span> &#123; hello &#125; <span class="keyword">from</span> <span class="string">'./b.js'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(hello);</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.js</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Come from b.js.'</span>);</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> hello = <span class="string">'Hello from b.js'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Come from b.js.</span><br><span class="line">Come from a.js.</span><br><span class="line">Hello from b.js</span><br></pre></td></tr></table></figure></p>
+<p>同样的代码使用 CommonJS 机制：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CommonJS</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// a.js</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Come from a.js.'</span>);</span><br><span class="line"><span class="keyword">const</span> hello = <span class="built_in">require</span>(<span class="string">'./b.js'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(hello);</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.js</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Come from b.js.'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = <span class="string">'Hello from b.js'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Come from a.js.</span><br><span class="line">Come from b.js.</span><br><span class="line">Hello from b.js</span><br></pre></td></tr></table></figure></p>
+<p>可以看到 ES Modules 预先解析了模块代码，而 CommonJS 是代码运行的时候解析的。</p>
+<h3 id="两个模块在原理上的区别"><a href="#两个模块在原理上的区别" class="headerlink" title="两个模块在原理上的区别"></a>两个模块在原理上的区别</h3><ol>
+<li>CommonJS</li>
+</ol>
+<p>Node 将每个文件都视为独立的模块，它定义了一个 Module 构造函数，它代表模块自身：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Module</span>(<span class="params">id = <span class="string">''</span>, parent</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.id = id;</span><br><span class="line">  <span class="keyword">this</span>.path = path.dirname(id);</span><br><span class="line">  <span class="keyword">this</span>.exports = &#123;&#125;;</span><br><span class="line">  <span class="keyword">this</span>.parent = parent;</span><br><span class="line">  <span class="keyword">this</span>.filename = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">this</span>.loaded = <span class="literal">false</span>;</span><br><span class="line">  <span class="keyword">this</span>.children = [];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>而 require 函数接收一个代表模块ID或者路径的值作为参数，它返回的是用<code>module.exports</code>导出的对象。在执行代码模块之前，NodeJs 将使一  个包装器对模块中的代码其进行封装：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params">exports, require, module, __filename, __dirname</span>) </span>&#123; </span><br><span class="line">    <span class="comment">// Module code actually lives in here </span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>引自 NodeJS 官网</p>
+<p>通过这样做，Node.js 实现了以下几点：</p>
+<ul>
+<li>它保持了顶层的变量（用 var、 const 或 let 定义）作用在模块范围内，而不是全局对象。</li>
+<li>它有助于提供一些看似全局的但实际上是模块特定的变量，例如：<ul>
+<li>实现者可以用于从模块中导出值的 module 和 exports 对象。</li>
+<li>包含模块绝对文件名和目录路径的快捷变量 <strong>filename 和 </strong>dirname 。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>简言之，每个模块都有自己的函数包装器， Node 通过此种方式确保模块内的代码对它是私有的。在包装器执行之前，模块内的导出内容是不确定的。<br>除此之外，第一次加载的模块会被缓存到 <code>Module._cache</code>中。一个完整的加载周期大致如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resolution (解析) –&gt; Loading (加载) –&gt; Wrapping (私有化) –&gt; Evaluation (执行) –&gt; Caching (缓存)</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li>ES Modules</li>
+</ol>
+<p>在 ESM 中，import 语句用于在解析代码时导入模块依赖的静态链接。文件的依赖关系在编译阶段就确定了。对于 ESM，模块的加载大致分为三步：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Construction (解析) -&gt; Instantiation (实例化、建立链接) -&gt; Evaluation (执行)</span><br></pre></td></tr></table></figure></p>
+<p>这些步骤是异步执行的，每一步都可以看作是相互独立的。这一点跟 CommonJS 有很大不同，对于 CommonJS 来说，每一步都是同步进行的。</p>
+<h3 id="两种模块间的相互引用"><a href="#两种模块间的相互引用" class="headerlink" title="两种模块间的相互引用"></a>两种模块间的相互引用</h3><p>CommonJS 和 ES Modules 都支持 <code>Dynamic import()</code>。它可以支持两种模块机制的导入：</p>
+<h4 id="在-CommonJS-文件中导入-ES-Modules-模块"><a href="#在-CommonJS-文件中导入-ES-Modules-模块" class="headerlink" title="在 CommonJS 文件中导入 ES Modules 模块"></a>在 CommonJS 文件中导入 ES Modules 模块</h4><p>由于 ES Modules 的加载、解析和执行都是异步的，而 require() 的过程是同步的、所以不能通过 require() 来引用一个 ES6 模块。ES6 提议的 import() 函数将会返回一个 Promise，它在 ES Modules 加载后标记完成。借助于此，我们可以在 CommonJS 中使用异步的方式导入 ES Modules：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 then() 来进行模块导入后的操作</span></span><br><span class="line"><span class="keyword">import</span>(<span class="string">"es6-modules.mjs"</span>).then(<span class="function">(<span class="params"><span class="built_in">module</span></span>)=&gt;</span>&#123;<span class="comment">/*…*/</span>&#125;).catch(<span class="function">(<span class="params">err</span>)=&gt;</span>&#123;<span class="comment">/**…*/</span>&#125;)</span><br><span class="line"><span class="comment">// 或者使用 async 函数</span></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="keyword">import</span>(<span class="string">'./es6-modules.mjs'</span>);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure></p>
+<h3 id="在-ES-Modules-文件中导入-CommonJS-模块"><a href="#在-ES-Modules-文件中导入-CommonJS-模块" class="headerlink" title="在 ES Modules 文件中导入 CommonJS 模块"></a>在 ES Modules 文件中导入 CommonJS 模块</h3><p>在 ES6 模块里可以很方便地使用 import 来引用一个 CommonJS 模块，因为在 ES6 模块里异步加载并非是必须的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="keyword">default</span> <span class="keyword">as</span> cjs &#125; <span class="keyword">from</span> <span class="string">'cjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The following import statement is "syntax sugar" (equivalent but sweeter)</span></span><br><span class="line"><span class="comment">// for `&#123; default as cjsSugar &#125;` in the above import statement:</span></span><br><span class="line"><span class="keyword">import</span> cjsSugar <span class="keyword">from</span> <span class="string">'cjs'</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(cjs);</span><br><span class="line"><span class="built_in">console</span>.log(cjs === cjsSugar);</span><br></pre></td></tr></table></figure></p>
+<h2 id="Node-中-ES-Modules-的现状和未来"><a href="#Node-中-ES-Modules-的现状和未来" class="headerlink" title="Node 中 ES Modules 的现状和未来"></a>Node 中 ES Modules 的现状和未来</h2><p>在引入 ES6 标准之前，服务器端 JavaScript 代码都是依赖 CommonJS 模块机制进行包管理的。<br>如今，随着 ES Modules 的引入，开发人员可以享受到与发布规范相关的许多好处。但需要注意的是，截止至当前时间(2020.11.30)，在最新版 Node v15.1.0 中，该特性依然是实验性的（Stability: 1），不建议在生产环境中使用该功能。</p>
+<p>最后，由于两种模块格式之间存在不兼容问题，将当前项目从 CommonJS 到 ES Modules 转换将是一个很大的挑战。可以借助 Babel 相关插件实现 CommonJS 和 ES Modules 间的相互转换：</p>
+<ul>
+<li><a href="https://babel.docschina.org/docs/en/babel-plugin-transform-modules-commonjs" target="_blank" rel="noopener">plugin-transform-modules-commonjs</a></li>
+<li><a href="https://www.npmjs.com/package/babel-plugin-transform-commonjs" target="_blank" rel="noopener">babel-plugin-transform-commonjs</a></li>
+</ul>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><h3 id="翻译原文"><a href="#翻译原文" class="headerlink" title="翻译原文"></a>翻译原文</h3><ul>
+<li><a href="https://blog.logrocket.com/es-modules-in-node-today/" target="_blank" rel="noopener">es-modules-in-node-today</a></li>
+<li><a href="https://aotu.io/notes/2017/04/22/an-update-on-es6-modules-in-node-js/index.html" target="_blank" rel="noopener">an-update-on-es6-modules-in-node-js</a></li>
+</ul>
+<h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h3><ul>
+<li><a href="https://nodejs.org/dist/latest-v14.x/docs/api/modules.html" target="_blank" rel="noopener">Node Documentation</a></li>
+<li><a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.4.0" target="_blank" rel="noopener">Node version13+ release log</a></li>
+<li><a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V14.md#14.15.0" target="_blank" rel="noopener">Node version14+ release log</a></li>
+<li><a href="https://github.com/nodejs/ecmascript-modules/blob/modules-lkgr/doc/api/modules.md#the-module-wrapper" target="_blank" rel="noopener">Node modules wrapper</a></li>
+<li><a href="https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js#L195" target="_blank" rel="noopener">Node Source code: cjs</a></li>
+<li><a href="https://tc39.es/ecma262/#sec-modules" target="_blank" rel="noopener">ECMA262 Modules</a></li>
+<li><a href="https://github.com/tc39/proposal-dynamic-import" target="_blank" rel="noopener">TC39 Proposal Dynamic import</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NodeJS/" rel="tag"># NodeJS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/23/【译】从-ES2016-到-ES2020-的所有特性/" rel="next" title="【译】从 ES2016 到 ES2020 的所有特性">
+                <i class="fa fa-chevron-left"></i> 【译】从 ES2016 到 ES2020 的所有特性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="Kuro-P">
+            
+              <p class="site-author-name" itemprop="name">Kuro-P</p>
+              <p class="site-description motion-element" itemprop="description">FE and more ...</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/Kuro-P" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="/about/" target="_blank" title="About">
+                      
+                        <i class="fa fa-fw fa-user"></i>About</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概览"><span class="nav-number">1.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-对-ES-Modules-支持"><span class="nav-number">2.</span> <span class="nav-text">Node 对 ES Modules 支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-NodeJS-中使用-ES-Modules"><span class="nav-number">3.</span> <span class="nav-text">在 NodeJS 中使用 ES Modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模块作用域"><span class="nav-number">3.1.</span> <span class="nav-text">模块作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#包的入口"><span class="nav-number">3.2.</span> <span class="nav-text">包的入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两个模块机制在执行时机上的区别"><span class="nav-number">3.3.</span> <span class="nav-text">两个模块机制在执行时机上的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两个模块在原理上的区别"><span class="nav-number">3.4.</span> <span class="nav-text">两个模块在原理上的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两种模块间的相互引用"><span class="nav-number">3.5.</span> <span class="nav-text">两种模块间的相互引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#在-CommonJS-文件中导入-ES-Modules-模块"><span class="nav-number">3.5.1.</span> <span class="nav-text">在 CommonJS 文件中导入 ES Modules 模块</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在-ES-Modules-文件中导入-CommonJS-模块"><span class="nav-number">3.6.</span> <span class="nav-text">在 ES Modules 文件中导入 CommonJS 模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-中-ES-Modules-的现状和未来"><span class="nav-number">4.</span> <span class="nav-text">Node 中 ES Modules 的现状和未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#翻译原文"><span class="nav-number">5.1.</span> <span class="nav-text">翻译原文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#官方文档"><span class="nav-number">5.2.</span> <span class="nav-text">官方文档</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
