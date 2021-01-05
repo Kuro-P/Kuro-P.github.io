@@ -109,4 +109,4 @@ deploy:
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "Add: Can NodeJS use ES6 import syntax"
+    message: "Add: 2020 Year Report"
