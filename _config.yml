@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "update: 2020 Year Report"
+    message: "update: douban"
 
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "update: 2020 Year Report"
+    message: "update: douban"
