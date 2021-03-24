@@ -80,6 +80,7 @@ __注意:__
 * name、email 的配置信息用来覆盖全局的 git config 中的配置，更改这两项后，需要删除根目录下的`.deploy_git`，部署时才会生效
 * master 只能放`/public`下的文件，将项目所有文件放到 master 分支下，会导致页面 build 失败。若想将本地代码全部提交，可部署在其他分支（在`_config.yml`中增加其他分支配置信息，详情参考文档）
 * 不提交 node_modules 的话，注意在项目下新建`.gitignore`文件（为什么不使用 extend_dirs ？因为需要添加的文件夹太多...）
+* 若遇见 `Error: EACCES: permission denied, unlink /XXX` 相关的错误，大部分是由没权限引起的，使用 `sudo chown -R `whoami`:staff /你的blog目录` 即可
 
 ### 搜索功能
 全局安装插件`npm install hexo-generator-search --save`

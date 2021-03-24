@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "add: WXminprogram note"
+    message: "update: WXminprogram note"
 
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "add: WXminprogram note"
+    message: "update: WXminprogram note"
