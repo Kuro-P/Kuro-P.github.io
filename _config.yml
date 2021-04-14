@@ -98,15 +98,16 @@ search:
 # Deployment
 # Docs: https://hexo.io/docs/deployment.html
 # hexo-deployer-git: https://github.com/hexojs/hexo-deployer-git
+# deploy:
+#   - type: git
+#     repo: https://github.com/Kuro-P/Kuro-P.github.io.git
+#     branch: master
+#     name: "Kuro-P"
+#     email: "837408039@qq.com"
+#     message: "add: H5&App交互 note"
 deploy:
   - type: git
-    repo: https://github.com/Kuro-P/Kuro-P.github.io.git
-    branch: master
-    name: "Kuro-P"
-    email: "837408039@qq.com"
-    message: "add: H5&App交互 note"
-
-  - type: git
     repo: aly:/var/repo/blog.git
+    name: "root"
     branch: master
     message: "add: H5&App交互 note"
