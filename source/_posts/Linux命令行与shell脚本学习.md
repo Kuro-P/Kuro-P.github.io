@@ -24,6 +24,7 @@ categories: 计算机相关知识
   
 ### 文件基础操作
 * open <fileName\> 用默认程序打开文件
+  * open <AppName> --args <参数> 用默认参数打开某个App
 * touch <fileName\> 创建一个文件 (不可在不存在的目录下新建文件)
 * mkdir <directory\> 创建一个文件夹
     * -p 创建多个层级的文件夹
@@ -96,7 +97,7 @@ categories: 计算机相关知识
 * $HOME 表示的用户的主目录，与波浪线`~`作用一样
 
 #### 普通变量
-声明时直接声明即可使用`variable=XXX`，变量名区分大小写，但需要注意的是 __赋值时，变量名、等号和值之间没有空格__ 否则会报错`command not found`。
+声明时直接声明即可使用 `variable=XXX`，变量名区分大小写，但需要注意的是 __赋值时，变量名、等号和值之间没有空格__ 否则会报错 `command not found`。
 常用的书写习惯是 __所有的环境变量名均使用大写字母，若是自己创建的局部变量或是shell脚本，则用小写字母，变量名区分大小写。__
 
 ### vim 操作
@@ -124,9 +125,14 @@ categories: 计算机相关知识
   * whereis <fileName\> 搜索更大范围的系统目录并输出所有包含的路径
   * find <fileName\> 查找系统是否安装了某个软件包
 
+### 代理
+* [参考](https://www.jianshu.com/p/c99373ad37f7)
+* 若想要在当前终端中生效，直接输入 `export http_proxy='http://ip_address:port'` 即可，注意 ip 和端口号是本机的 ip + port;
+* 想要持久化全局生效的话，可以在 .zhsrc 中配置上述命令
+
 ### 常用的配置文件地址
-* Host文件 /etc/hosts
-* 配置的SSH Key: cat ~/.ssh/id_rsa.pub
+* Host 文件 /etc/hosts
+* 配置的 SSH Key: cat ~/.ssh/id_rsa.pub
 
 ### 常见文件颜色
 * 白色：表示普通文件
@@ -142,6 +148,7 @@ categories: 计算机相关知识
 * homebrew 包管理器
     * brew install <packageName\> 安装插件
     * brew list 查看电脑安装了哪些插件
+    * 注：每次下载包之前都会进行 brew 更新检查，速度很慢，按一次 `Ctrl+C` 跳过更新
 * wget 下载网页常用的工具
 * curl 模拟 http 请求，类似于 POSTMAN
     * curl <url\> 直接返回 url 请求结果
