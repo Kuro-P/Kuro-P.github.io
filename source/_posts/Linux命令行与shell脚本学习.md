@@ -149,6 +149,7 @@ categories: 计算机相关知识
     * brew install <packageName\> 安装插件
     * brew list 查看电脑安装了哪些插件
     * 注：每次下载包之前都会进行 brew 更新检查，速度很慢，按一次 `Ctrl+C` 跳过更新
+    * 官网上的 github 源安装总是会 443 connect timeout，推荐使用国内的镜像安装：`bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"`
 * wget 下载网页常用的工具
 * curl 模拟 http 请求，类似于 POSTMAN
     * curl <url\> 直接返回 url 请求结果
