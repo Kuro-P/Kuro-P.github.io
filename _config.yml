@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "add: H5 & App 交互 note"
+    message: "add: 写给大家看的设计书-读书小结"
 
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "add: H5 & App 交互 note"
+    message: "add: 写给大家看的设计书-读书小结"
