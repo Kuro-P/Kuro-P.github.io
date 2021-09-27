@@ -54,6 +54,8 @@ Hexo官网提供了一些主题  [https://hexo.io/themes/ ](https://hexo.io/them
 ### 插件
 * [hexo-deployer-git](https://github.com/hexojs/hexo-deployer-git) 一键部署到 GitPage
 * [hexo-douban](https://github.com/mythsman/hexo-douban) 爬取豆瓣相关信息
+  * 如遇网络问题爬取失败的报错，将 node 回退到 12.18.x 后重试（[issue地址](https://github.com/mythsman/hexo-douban/issues/77)）
+  * 如果生成的 /movies 页面访问报错，将 hexo 版本回退到 3.9.0 后重试
 * [hexo-generator-search](https://github.com/wzpan/hexo-generator-search) 全文搜索功能
 
 ### 部署
