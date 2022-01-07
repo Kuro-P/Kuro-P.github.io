@@ -21,6 +21,10 @@ PS: .sh file have too many errors on Windows
 __Develop on MacOS:__
 * Use `npm run deploy` to deploy and commit files to master and develop branch.
 
+### 2022.1.7
+* hexo-douban only can work in Node 12.18.4 or older version.
+  * referer: https://github.com/mythsman/hexo-douban/issues/77
+
 Problems:
 
 * git warning  `LF will be replaced by CRLF` 
