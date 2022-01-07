@@ -104,9 +104,9 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "add: 写给大家看的设计书-读书小结"
+    message: "add: 2021年终总结"
 
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "add: 写给大家看的设计书-读书小结"
+    message: "add: 2021年终总结"
