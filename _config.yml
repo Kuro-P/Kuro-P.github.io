@@ -100,13 +100,6 @@ search:
 # hexo-deployer-git: https://github.com/hexojs/hexo-deployer-git
 deploy:
   - type: git
-    repo: https://github.com/Kuro-P/Kuro-P.github.io.git
-    branch: master
-    name: "Kuro-P"
-    email: "837408039@qq.com"
-    message: "commit_message: movie/book/game"
-
-  - type: git
     repo: aly:/var/repo/blog.git
     branch: master
     message: "commit_message"
