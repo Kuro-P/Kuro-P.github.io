@@ -109,4 +109,4 @@ deploy:
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
-    message: "fix: website deploy"
+    message: "commit_message"
