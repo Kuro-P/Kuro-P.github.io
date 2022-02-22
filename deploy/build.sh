@@ -2,7 +2,7 @@
 # git commit (develop)
 git status
 git diff
-read -t 30 -p "Confirm summit changes(Y/N)?" confirm
+read -t 30 -p "Confirm submit changes(Y/N)?" confirm
 
 if [ $(echo $confirm | tr '[A-Z]' '[a-z]')=="y" ]
 then
