@@ -1,7 +1,7 @@
 ---
 title: 【译】Can NodeJS use ES6 import syntax ?
 date: 2020-12-10 20:36:12
-tags: [NodeJS]
+tags: [NodeJS, 翻译]
 categories: [后端]
 ---
 偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇[文章](/2019/01/03/前端模块化/#more)，这里不再赘述。

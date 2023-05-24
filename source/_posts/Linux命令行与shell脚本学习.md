@@ -106,6 +106,7 @@ categories: 计算机相关知识
 * 按 `esc` 退出当前编辑模式
 * 输入 `:` 切换到底线命令模式，可以在最底行输入其他命令
 * 输入 `wq` ，保存并退出；输入 `!q`，不保存直接退出
+* 输入 `ggdG`，删除当前全部内容；`gg` 为跳转到文件首行；`dG`为删除光标所在行以及其下所有行的内容
 * .swp 文件: 非正常关闭的 vim 编辑器会生成一个 .swp 文件
 
 ### 杂项
@@ -151,8 +152,14 @@ categories: 计算机相关知识
     * 注：每次下载包之前都会进行 brew 更新检查，速度很慢，按一次 `Ctrl+C` 跳过更新
     * 官网上的 github 源安装总是会 443 connect timeout，推荐使用国内的镜像安装：`bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"`
 * wget 下载网页常用的工具
-* curl 模拟 http 请求，类似于 POSTMAN
+* curl 是用来请求 Web 服务器的命令行工具，类似于 POSTMAN，它的名字就是客户端（client）的 URL 工具的意思。curl 支持的通信协议有 FTP、FTPS、HTTP、HTTPS、TFTP、SFTP、Gopher、SCP、Telnet、DICT、FILE、LDAP、LDAPS、IMAP、POP3、SMTP 和 RTSP。curl 还支持 SSL 认证、HTTP POST、HTTP PUT、FTP上传, HTTP form based upload、proxies、HTTP/2、cookies、用户名+密码认证(Basic, Plain, Digest, CRAM-MD5, NTLM, Negotiate and Kerberos)、file transfer resume、proxy tunneling。
     * curl <url\> 直接返回 url 请求结果
+      * `-A/--user-agent <string\>` 设置用户代理发送给服务器
+      * `-D/--dump-header <file\>` 把 header 信息写入到该文件中
+      * `-O/--output <file\>` 把输出写到该文件中
+      * `-#/--progress-bar` 进度条显示当前传送状态
+      * [详细信息](https://www.amd5.cn/atang_4752.html)
+    * 需要注意的是，做了反爬措施的网站在直接 curl 请求的时候，结果可能不如预期
 * tree 以树状图形式展示目录及其子文件
     * tree <directory\> -J 以 json 形式展示文件
 * tig 将git命令行可视化
