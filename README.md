@@ -21,12 +21,23 @@ PS: .sh file have too many errors on Windows
 __Develop on MacOS:__
 * Use `npm run deploy` to deploy and commit files to master and develop branch.
 
-### 2022.1.7
-* hexo-douban only can work in Node 12.18.4 or older version.
-  * referer: https://github.com/mythsman/hexo-douban/issues/77
-* hexo deploy work env as same as hexo-douban.
+### 2022.1.7 (discarded)
+* <del>hexo-douban only can work in Node 12.18.4 or older version.</del>
+  * <del>referer: https://github.com/mythsman/hexo-douban/issues/77</del>
+* <del>hexo deploy work env as same as hexo-douban.</del>
 
+### 2023.7.14
+__Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
+* `theme-next` update failed ❌
+  * I perfer the old version appearance, so I keep version stay at v`5.1.4`.
+  * See more: [Documentation of upgrade](https://theme-next.js.org/docs/getting-started/upgrade.html)
+* `hexo` update failed ❌
+  * if `theme-next` version not update, then you should keep hexo version at v`3.9.0`, or you will get `Cannot GET /%20/` error on page. See https://github.com/hexojs/hexo/issues/4375.
+  * if `server` command output page with swig template, try `npm install hexo-renderer-swig` or upgrade `theme-next` version. See https://stackoverflow.com/questions/63405693/hexo-cannot-display-next-theme.
+  * if `WARN No layout: index.html` error in terminal output, go to check dir name that under the `/themes`, it should be the same as `_config.yml` theme field.
+* local `hexo-cli` update success ✅
+* `hexo-douban` update success ✅
 
-Problems:
-
-* git warning  `LF will be replaced by CRLF` 
+ 
+### TODO
+* Gt commit warning on Windows:  `LF will be replaced by CRLF` 

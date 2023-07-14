@@ -1,5 +1,5 @@
-# Hexo Configuration
-## Docs: https://hexo.io/docs/configuration.html
+# Hexo Concommit_messageguration
+## Docs: https://hexo.io/docs/concommit_messageguration.html
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
@@ -32,7 +32,6 @@ skip_render: README.md
 new_post_name: :title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
-external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
 post_asset_folder: true
@@ -60,7 +59,7 @@ tag_map:
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
-## You can customize the date format as defined in
+## You can customize the date format as decommit_messagened in
 ## http://momentjs.com/docs/#/displaying/format/
 date_format: YYYY-MM-DD HH:mm:ss
 time_format: HH:mm:ss
@@ -73,12 +72,12 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: next-old
 
 # douban plugin 
 # Docs: https://github.com/mythsman/hexo-douban
 douban: 
-  user: 165832165
+  id: 165832165
   builtin: false
   book:
     title: 读书
@@ -99,6 +98,13 @@ search:
 # Docs: https://hexo.io/docs/deployment.html
 # hexo-deployer-git: https://github.com/hexojs/hexo-deployer-git
 deploy:
+  - type: git
+    repo: https://github.com/Kuro-P/Kuro-P.github.io.git
+    branch: master
+    name: "Kuro-P"
+    email: "837408039@qq.com"
+    message: "commit_message: movie/book/game"
+
   - type: git
     repo: aly:/var/repo/blog.git
     branch: master
