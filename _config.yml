@@ -104,8 +104,3 @@ deploy:
     name: "Kuro-P"
     email: "837408039@qq.com"
     message: "commit_message: movie/book/game"
-
-  - type: git
-    repo: aly:/var/repo/blog.git
-    branch: master
-    message: "commit_message"
