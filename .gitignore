@@ -2,4 +2,4 @@
 .DS_Store
 .vscode/*
 **/public
-.deploy_git/*
+.deploy_git

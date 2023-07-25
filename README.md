@@ -1,8 +1,10 @@
 # Kuro-P.github.io
 My blog record. [https://kuro-p.github.io/](https://kuro-p.github.io/)
 
-### Branch develop
+## Develop
 If there's some files you don't want to commit, please use `.gitignore` but not hexo-deployer-git.
+
+## Changlog
 
 ### 2019.11.14
 Hexo's Blog use `hexo-deployer-git` deploy on master.<br/>
@@ -38,6 +40,13 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 * local `hexo-cli` update success ✅
 * `hexo-douban` update success ✅
 
- 
+
+### 2023.7.21
+* revert local hexo-cli version to `v2.0.0`, or `hexo generate` command will generate empty html files 
+
+### 2023.7.25
+* chore: upgrade `hexo`、`hexo-cli`、`theme-next` verison, remove useless packages.
+* fix: embed img display error ( use asset_img tag instead of markdown syntax )
+
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 

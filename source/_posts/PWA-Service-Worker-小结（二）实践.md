@@ -22,7 +22,7 @@ Service Worker 的初衷是极致优化用户体验，带来丝滑般流畅的�
 3. 激活后，在 sw 的作用域下作用所有的页面，首次注册 sw 不会生效，下次加载页面才会生效；已经注册的 sw 不会重复注册；不会因为页面的关闭而被销毁；
 4. sw 作用页面后，处理 fetch（网络请求）和 postMessage（页面消息）事件 或者 被终止（节省内存）。
 
-![](/Service-Worker-Lifecycle.png "Service Worker Lifecycle")
+{% asset_img "Service-Worker-Lifecycle.png" "Service Worker Lifecycle" %}
 
 ### 三、Service Worker 安装注册
 #### 注册文件

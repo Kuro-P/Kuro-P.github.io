@@ -1,10 +1,10 @@
 ---
-title: Markdown 语法小记
+title: markdown 语法小记
 date: 2018-09-05 18:21:06
-tags: [Markdown]
+tags: [markdown]
 categories: 其他小结
 ---
-第一个Hexo-next主题的blog，主要用来记录markdown语法
+第一个 hexo-next 主题的 blog，主要记录下 markdown 语法
 <!--more-->
 
 ### 测试文本样式
@@ -28,15 +28,15 @@ var FE_developer = {
 console.log('info', FE_developer);
 ````
 #### 测试单行代码样式
-在JS中我们常用`console.log()`来输出调试信息。
+在 JS 中我们常用 `console.log()` 来输出调试信息。
 
 #### 测试代码块样式
-```
+```js
 function test(a, b){
-	setTimeout(function(){
-		console.log(a + b);
-		setTimeout(arguments.callee, 500);
-		}, 500)
+  setTimeout(function () {
+  	console.log(a + b);
+  	setTimeout(arguments.callee, 500);
+  }, 500)
 }
 ```
 
@@ -62,10 +62,13 @@ __注意：表格前若有文本，需要空一行才能正常显示__
 
 
 ### 测试插入图片
-来自百度图片: ![夏日西瓜](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1536749860&di=13b529d93aa88d542b4e7d1fece8cd85&imgtype=jpg&er=1&src=http%3A%2F%2Fpic.90sjimg.com%2Fdesign%2F00%2F89%2F85%2F87%2Fs_1024_58bd1a48a0978.png "西瓜")
+来自百度图片: 
+
+<img src="https://ts1.cn.mm.bing.net/th/id/R-C.b2e807d164d8843a80d4e43d6d2cd14e?rik=vBI7UrFJE09fIQ&riu=http%3a%2f%2fimg95.699pic.com%2felement%2f40114%2f3510.png_860.png&ehk=VVAaXYYnxQaqoogiFcOBZsxixfBN1ZsVpGOfySvfy3Y%3d&risl=&pid=ImgRaw&r=0" width="200" alt="西瓜"/>
+
 
 ### 测试列表
-git常用语法
+git 常用语法
 * git status
 * git add .
 * git commit -m"XXX"
@@ -106,6 +109,6 @@ c1(yes)->io2->e
 ```
 
 ### 其他注意事项
-* 在 Markdown 中直接使用尖括号`<something>`会被文本默认为HTML标签语句而不予显示。
+* 在 markdown 中直接使用尖括号`<something>`会被文本默认为HTML标签语句而不予显示。
     * 使用转义字符`&lt;`代替`<`，用`&gt;`代替`>`
-    * 或者右闭合的尖括号前加一个转义符号`\`，例如：`<something\>`
+    * 或者左闭合的尖括号前加一个转义符号`\`，例如：“\\<something\>”

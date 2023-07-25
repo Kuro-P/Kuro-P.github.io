@@ -3,17 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.9.0"
+    "version": "7.0.0-rc2"
   },
   "scripts": {
     "deploy": "sh deploy/build.sh",
     "start": "hexo server",
+    "build": "hexo generate",
     "douban": "hexo douban"
   },
   "dependencies": {
-    "g": "^2.0.1",
-    "hexo": "^3.9.0",
-    "hexo-asset-image": "1.0.0",
+    "hexo": "^7.0.0-rc2",
     "hexo-deployer-git": "^4.0.0",
     "hexo-douban": "^2.2.1",
     "hexo-filter-flowchart": "^1.0.4",

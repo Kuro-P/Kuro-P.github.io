@@ -46,7 +46,7 @@ categories: 计算机相关知识
   * r=读取属性 //值=4
   * w=写入属性 //值=2
   * x=执行属性 //值=1
-  ![文件权限](/file-permissions.png)
+  {% asset_img "file-permissions.png" "文件权限" %}
 * chown(选项)(参数) 更改文件夹所有者和所属组
   * chown -R user:group .git 将.git文件夹的权限设置为 group 下的 user
 * 获取文件路径：直接将文件拖入命令行即可
@@ -150,7 +150,10 @@ categories: 计算机相关知识
     * brew install <packageName\> 安装插件
     * brew list 查看电脑安装了哪些插件
     * 注：每次下载包之前都会进行 brew 更新检查，速度很慢，按一次 `Ctrl+C` 跳过更新
-    * 官网上的 github 源安装总是会 443 connect timeout，推荐使用国内的镜像安装：`bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"`
+    * 官网上的 github 源安装总是会 443 connect timeout，推荐使用国内的镜像安装：
+```
+bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
+```
 * wget 下载网页常用的工具
 * curl 是用来请求 Web 服务器的命令行工具，类似于 POSTMAN，它的名字就是客户端（client）的 URL 工具的意思。curl 支持的通信协议有 FTP、FTPS、HTTP、HTTPS、TFTP、SFTP、Gopher、SCP、Telnet、DICT、FILE、LDAP、LDAPS、IMAP、POP3、SMTP 和 RTSP。curl 还支持 SSL 认证、HTTP POST、HTTP PUT、FTP上传, HTTP form based upload、proxies、HTTP/2、cookies、用户名+密码认证(Basic, Plain, Digest, CRAM-MD5, NTLM, Negotiate and Kerberos)、file transfer resume、proxy tunneling。
     * curl <url\> 直接返回 url 请求结果
@@ -162,7 +165,7 @@ categories: 计算机相关知识
     * 需要注意的是，做了反爬措施的网站在直接 curl 请求的时候，结果可能不如预期
 * tree 以树状图形式展示目录及其子文件
     * tree <directory\> -J 以 json 形式展示文件
-* tig 将git命令行可视化
+* tig 将 git 命令行可视化
 
 __其他参考:__
 * __[Linux命令大全](http://man.linuxde.net/)__
