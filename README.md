@@ -50,6 +50,7 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 
 ### 2023 7.26
 * feat: add `source/_data/styles.styl` file to custom style
+* feat: add new version theme-next files (remove it .git folder)
 
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 
