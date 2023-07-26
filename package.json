@@ -8,7 +8,7 @@
   "scripts": {
     "deploy": "sh deploy/build.sh",
     "start": "hexo server",
-    "build": "hexo generate",
+    "build": "hexo douban && hexo generate",
     "douban": "hexo douban"
   },
   "dependencies": {

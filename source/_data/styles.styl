@@ -1,0 +1,82 @@
+// custom styles
+
+// menu style
+.site-nav {
+  font-size: 1.2em;
+}
+
+// sidebar style
+.sidebar {
+  font-size: 1.1em;
+}
+.site-author {
+  // Animation referer: https://codepen.io/Venerons/pen/dyNdLL
+  .gelatine {
+    animation: gelatine 0.5s infinite;
+  }
+  @keyframes gelatine {
+    from, to { transform: scale(1, 1); }
+    25% { transform: scale(0.9, 1.1); }
+    50% { transform: scale(1.1, 0.9); }
+    75% { transform: scale(0.95, 1.05); }
+  }
+
+  .hithere {
+    animation: hithere 1s ease infinite;
+  }
+  @keyframes hithere {
+    30% { transform: scale(1.2); }
+    40%, 60% { transform: rotate(-20deg) scale(1.2); }
+    50% { transform: rotate(20deg) scale(1.2); }
+    70% { transform: rotate(0deg) scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .shake {
+    animation: shake 2s ease infinite;
+  }
+  @keyframes shake {
+  	0%, 100% {transform: translateX(0);}
+  	10%, 30%, 50%, 70%, 90% {transform: translateX(-10px);}
+  	20%, 40%, 60%, 80% {transform: translateX(10px);}
+  }
+
+  .hinge {
+    animation: hinge 2s ease infinite;
+  }
+  @keyframes hinge {
+    0% { transform: rotate(0); transform-origin: top left; animation-timing-function: ease-in-out; }  
+    20%, 60% { transform: rotate(80deg); transform-origin: top left; animation-timing-function: ease-in-out; }  
+    40% { transform: rotate(60deg); transform-origin: top left; animation-timing-function: ease-in-out; } 
+    80% { transform: rotate(60deg) translateY(0); opacity: 1; transform-origin: top left; animation-timing-function: ease-in-out; } 
+    100% { transform: translateY(700px); opacity: 0; }
+  }
+
+  .site-author-image {
+    // animation: gelatine 0.5s infinite;
+  }
+  &:hover {
+    .site-author-image {
+      animation: shake 1s ease infinite;
+    }
+  }
+}
+
+// post
+.posts-expand {
+  .post-meta {
+    font-size: 0.85em;
+    margin-bottom: 30px; 
+  }
+}
+.post-footer {
+  .post-eof {
+    margin: 55px auto 45px;
+  }
+}
+
+.post-toc {
+  .nav-item {
+    line-height: 2.1;
+  }
+}

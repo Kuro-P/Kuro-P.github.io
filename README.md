@@ -48,5 +48,8 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 * chore: upgrade `hexo`、`hexo-cli`、`theme-next` verison, remove useless packages.
 * fix: embed img display error ( use asset_img tag instead of markdown syntax )
 
+### 2023 7.26
+* feat: add `source/_data/styles.styl` file to custom style
+
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 
