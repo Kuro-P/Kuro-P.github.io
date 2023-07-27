@@ -4,9 +4,9 @@ run-name: Deploy by @${{ github.actor }}
 
 on:
   push:
-    branches: ["master"]
+    branches: ["develop"]
   pull_request:
-    branches: ["master"]
+    branches: ["develop"]
 
 jobs:
   build:
