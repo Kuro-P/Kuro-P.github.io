@@ -9,7 +9,7 @@ on:
     branches: ["develop"]
 
 jobs:
-  install:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,17 +29,17 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-  build:
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - run: npm run clean
-      - run: npm run build
-      - run: npm run douban
-  deploy:
-    needs: [install, build]
-    runs-on: ubuntu-latest
-    steps:
-      - run: npm run deploy
+
+      - name: Clean files
+        run: npm run clean
+      
+      - name: Build post files
+        run: npm run build
+      
+      - name: Build douban files
+        run: npm run douban
+
+      - name: Deploy
+        run: npm run deploy
 
       
