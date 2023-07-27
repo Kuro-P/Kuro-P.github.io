@@ -49,8 +49,11 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 * fix: embed img display error ( use asset_img tag instead of markdown syntax )
 
 ### 2023 7.26
-* feat: add `source/_data/styles.styl` file to custom style
-* feat: add new version theme-next files (remove it .git folder)
+* feat: add custom style file `source/_data/styles.styl`
+* feat: add new version theme-next files (and remove subsidiary .git folder)
+
+### 2023 7.27
+* feat: enable fancybox
 
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 

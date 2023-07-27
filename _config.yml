@@ -103,4 +103,4 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "837408039@qq.com"
-    message: "feat: update style"
+    message: "feat: enable fancybox"
