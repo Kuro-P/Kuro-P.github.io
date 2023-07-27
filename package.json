@@ -1,14 +1,16 @@
 {
-  "name": "hexo-site",
+  "name": "kurop-hexo-site",
   "version": "0.0.0",
   "private": true,
   "hexo": {
     "version": "7.0.0-rc2"
   },
   "scripts": {
-    "deploy": "sh deploy/build.sh",
-    "start": "hexo server",
+    "clean": "hexo clean",
+    "dev": "hexo server",
     "build": "hexo douban && hexo generate",
+    "deploy": "hexo deploy",
+    "deploy-private": "sh deploy/build.sh",
     "douban": "hexo douban"
   },
   "dependencies": {
