@@ -99,8 +99,8 @@ search:
 # hexo-deployer-git: https://github.com/hexojs/hexo-deployer-git
 deploy:
   - type: git
-    repo: https://github.com/Kuro-P/Kuro-P.github.io.git
+    repo: git@github.com:Kuro-P/Kuro-P.github.io.git
     branch: master
     name: "Kuro-P"
-    email: "837408039@qq.com"
-    message: "feat: enable fancybox"
+    email: "kuro8374@foxmail.com"
+    message: "fix: ci error"
