@@ -13,6 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+    
+      - name: Config environment
+        env: 
+          HEXO_DEPLOY_KRY_PRI: ${{ secrets.HEXO_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$HEXO_DEPLOY_KRY_PRI" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git config --global user.name "${{ github.actor }}"
 
       - name: Setup node version
         uses: actions/setup-node@v3
@@ -29,9 +39,6 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-
-      - name: Clean files
-        run: npm run clean
       
       - name: Build post files
         run: npm run build
