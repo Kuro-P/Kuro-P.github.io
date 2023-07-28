@@ -9,7 +9,7 @@ on:
     branches: ["develop"]
 
 env:
-  TZ: Asia/Beijing
+  TZ: Asia/Shanghai
 
 jobs:
   build-and-deploy:
