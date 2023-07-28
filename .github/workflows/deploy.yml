@@ -41,5 +41,8 @@ jobs:
 
       - name: Deploy
         run: npm run deploy
+        env:
+          PERSONAL_TOKEN: ${{secrets.HEXO_DEPLOY_TOKEN}}
+
 
       
