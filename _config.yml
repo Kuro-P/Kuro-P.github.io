@@ -103,4 +103,4 @@ deploy:
     branch: master
     name: "Kuro-P"
     email: "kuro8374@foxmail.com"
-    message: "fix: ci error"
+    message: "fix: post updated time"
