@@ -41,8 +41,6 @@ jobs:
         run: |
           echo "name: ${{ steps.package.outputs.name }}"
           echo "version: ${{ steps.package.outputs.version }}"
-          echo "npmjs-link: ${{ steps.package.outputs.npmjs-link }}"
-          echo "is-release-candidate: ${{ steps.package.outputs.is-release-candidate }}
       
       - name: Cache node modules
         uses: actions/cache@v3
