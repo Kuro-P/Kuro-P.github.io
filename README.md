@@ -1,6 +1,9 @@
 # Kuro-P.github.io
 My blog record. [https://kuro-p.github.io/](https://kuro-p.github.io/)
 
+
+ ![deploy workflow](https://github.com/Kuro-P/Kuro-P.github.io/actions/workflows/deploy.yml/badge.svg)
+
 ## Develop
 If there's some files you don't want to commit, please use `.gitignore` but not hexo-deployer-git.
 
@@ -54,6 +57,9 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 
 ### 2023 7.27
 * feat: enable fancybox
+
+### 2023 7.28
+* feat: use github action to automate deployment
 
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 
