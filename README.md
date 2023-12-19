@@ -61,5 +61,8 @@ __Try to Upgrade `hexo`, `theme-next` and `hexo-douban` 's version__
 ### 2023 7.28
 * feat: use github action to automate deployment
 
+### 2023 10.20
+* fix: local hexo dev not work cause package.json lack of `hexo` configuration. 
+
 ### TODO
 * Gt commit warning on Windows:  `LF will be replaced by CRLF` 

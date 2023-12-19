@@ -10,9 +10,11 @@
     "deploy-private": "sh deploy/build.sh",
     "douban": "hexo douban"
   },
+  "hexo": {
+    "version": "6.3.0"
+  },
   "dependencies": {
-    "hexo": "^7.0.0-rc2",
-    "hexo-cli": "^4.3.1",
+    "hexo": "^6.3.0",
     "hexo-deployer-git": "^4.0.0",
     "hexo-douban": "^2.2.1",
     "hexo-filter-flowchart": "^1.0.4",
