@@ -4,14 +4,29 @@ run-name: Deploy by @${{ github.actor }}
 
 on:
   push:
-    branches: ["develop"]
+    branches: ["test"]
   pull_request:
-    branches: ["develop"]
+    branches: ["test"]
 
 env:
   TZ: Asia/Shanghai
 
 jobs:
+  test-package-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Compare version
+        run: node common/compare-version.js  
+
+      - name: Console test
+        run: echo "version check completely" 
+
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
@@ -33,14 +48,9 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      - name: Get package info
-        id: package
-        uses: codex-team/action-nodejs-package-info@v1.1
-        
-      - name: Get the output
-        run: |
-          echo "name: ${{ steps.package.outputs.name }}"
-          echo "version: ${{ steps.package.outputs.version }}"
+      # - name: Check version change and commit message?
+      #   run: echo "IS_CHANGED=$(git diff './package.json')"  
+      #   run: echo "IS_CHANGED=$(node common/compare-version.js)" 
       
       - name: Cache node modules
         uses: actions/cache@v3
