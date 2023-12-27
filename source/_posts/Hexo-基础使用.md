@@ -36,20 +36,20 @@ Hexo 官网提供了一些主题  [https://hexo.io/themes/ ](https://hexo.io/the
   * 由于先前已经删除了主题目录下的 `.git` 文件夹，所以无法通过 `git pull` 来更新。每次更新需要将新的代码 clone 到 `/theme` 文件夹中，再手动迁移，比较麻烦，建议有大版本时再更新... 
   
 ### 生成文章
-````
-    hexo new "postName" # /source/_post/postName & .md
-    hexo new page "pageName" # /source/pageName/index & index.md
+```sh
+    hexo new "postName" # /source/_post/[postName]/ & /source/_post/[postName].md
+    hexo new page "pageName" # /source/[pageName]/index/ & /source/[pageName]/index.md
     hexo generate # /source/.md -> /public/.html
     hexo server 
     hexo deploy # 将 /public 目录部署到 GitHub
-````
+```
 
 ### 删除文章
-````
+```sh
     hexo clean # delete /public
     hexo generate # regenerate /public
     hexo deploy
-````
+```
 
 ### 其他
 - **插入本地图片**
