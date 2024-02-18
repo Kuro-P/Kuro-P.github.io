@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="去年设计部门与客户端团队落地了一项新的动画方案: libpag，是腾讯开源的一个全平台动效插件。正好去年年中有个前端需求需要用到 pag 动画，调研后封装成库方便组内调用。今年主要是维护和修 bug，并支持了 React 组件渲染。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="libpag 初使用 &amp; render-pag 的诞生">
+<meta property="og:url" content="http://yoursite.com/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="去年设计部门与客户端团队落地了一项新的动画方案: libpag，是腾讯开源的一个全平台动效插件。正好去年年中有个前端需求需要用到 pag 动画，调研后封装成库方便组内调用。今年主要是维护和修 bug，并支持了 React 组件渲染。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png">
+<meta property="og:image" content="http://yoursite.com/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/render-pag%E6%B8%B2%E6%9F%93%E8%BF%87%E7%A8%8B.png">
+<meta property="article:published_time" content="2023-12-28T05:57:55.000Z">
+<meta property="article:modified_time" content="2024-02-18T11:54:15.110Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="NodeJS">
+<meta property="article:tag" content="开发小结">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png">
+
+<link rel="canonical" href="http://yoursite.com/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>libpag 初使用 & render-pag 的诞生 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          libpag 初使用 & render-pag 的诞生
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-12-28 13:57:55 13:57:55" itemprop="dateCreated datePublished" datetime="2023-12-28T13:57:55+08:00">2023-12-28 13:57:55</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-18 19:54:15 19:54:15" itemprop="dateModified" datetime="2024-02-18T19:54:15+08:00">2024-02-18 19:54:15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>去年设计部门与客户端团队落地了一项新的动画方案: libpag，是腾讯开源的一个全平台动效插件。<br>正好去年年中有个前端需求需要用到 pag 动画，调研后封装成库方便组内调用。<br>今年主要是维护和修 bug，并支持了 React 组件渲染。 </p>
+<span id="more"></span>
+
+<h3 id="libpag-调研"><a href="#libpag-调研" class="headerlink" title="libpag 调研"></a>libpag 调研</h3><p>libpag 核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL实现，最终生成的动画文件是二进制文件，所以在体积上很占优势。<br>引入时需要引入 <code>libpag.js</code> 和 <code>libpag.wasm</code> 两个文件。</p>
+<h3 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h3><p>官方文档  <a target="_blank" rel="noopener" href="https://pag.art/">https://pag.art</a> <br/><br>Github <a target="_blank" rel="noopener" href="https://github.com/Tencent/libpag">https://github.com/Tencent/libpag</a> <br/><br>Github demo <a target="_blank" rel="noopener" href="https://github.com/libpag/pag-web">https://github.com/libpag/pag-web</a> <br/><br>libpag 官方 CDN <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/npm/libpag@latest/lib/">https://cdn.jsdelivr.net/npm/libpag@latest/lib/</a> <br/><br>ffavc 官方 CDN <a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/npm/ffavc@latest/lib/">https://cdn.jsdelivr.net/npm/ffavc@latest/lib/</a> <br/><br>（需要注意的是，腾讯的 CDN 并没有提供 Gzip， 所以访问起来会比较慢）</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>生成文件格式为二进制，文件相比于 json 小很多，且不用考虑图片文件外挂的问题（如 Lottie Web）</li>
+<li>利用 canvas 实现播放，无需用户手动触发<ul>
+<li>如果包含 BMP 序列帧则需要用户手动触发交互（因为 BMP 会调用视频标签），使用官方推荐的解码器 (ffavc) 可解决这一问题</li>
+</ul>
+</li>
+<li>如果动画较长较复杂且没有交互，则更推荐使用 MP4。PAG 的优势在于矢量性能优于视频、BMP 预合成、可编辑性、跨平台支持等</li>
+</ul>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>ES6 方式引入需要额外处理 .wasm 文件<ul>
+<li>libpag 依赖的 wasm 文件是比较大的，有 2.9M 左右；官方推荐的方式的将 wasm 放到 CDN 上并开启 Gzip 压缩，压缩后的 Gzip 文件大概是 890k，可以秒加载</li>
+</ul>
+</li>
+<li>由于底层用 WebAssembly 来编译 C++ 代码，需要手动 GC（手动 destroy 实例）</li>
+</ul>
+<h4 id="兼容性"><a href="#兼容性" class="headerlink" title="兼容性"></a>兼容性</h4><table>
+<thead>
+<tr>
+<th><a target="_blank" rel="noopener" href="http://godban.github.io/browsers-support-badges/"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /></a><br/>Chrome</th>
+<th><a target="_blank" rel="noopener" href="http://godban.github.io/browsers-support-badges/"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /></a><br/>Safari</th>
+<th><a target="_blank" rel="noopener" href="http://godban.github.io/browsers-support-badges/"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /></a><br/>Chrome for Android</th>
+<th><a target="_blank" rel="noopener" href="http://godban.github.io/browsers-support-badges/"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /></a><br/>Safari on iOS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Chrome &gt;&#x3D; 69</td>
+<td>Safari &gt;&#x3D; 11.3</td>
+<td>Android &gt;&#x3D; 7.0</td>
+<td>iOS &gt;&#x3D; 11.3</td>
+</tr>
+</tbody></table>
+<p><strong>公司客户端需要兼容到 IOS &gt;&#x3D; 11、Android &gt;&#x3D; 5，针对不支持 pag 动画播放的设备将显示静态图片</strong></p>
+<h3 id="绘制流程"><a href="#绘制流程" class="headerlink" title="绘制流程"></a>绘制流程</h3><img src="/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/render-pag%E6%B8%B2%E6%9F%93%E8%BF%87%E7%A8%8B.png" class="" width="600">
+
+<h3 id="简要代码"><a href="#简要代码" class="headerlink" title="简要代码"></a>简要代码</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">PAGInit</span> &#125; <span class="keyword">from</span> <span class="string">&quot;libpag&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 wasm 实例</span></span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">PAG</span> = <span class="keyword">await</span> <span class="title class_">PAGInit</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 pag 文件数据</span></span><br><span class="line"><span class="keyword">const</span> <span class="title class_">PAGData</span> = <span class="keyword">await</span> <span class="title function_">fetch</span>(pagUrl);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">PAGFileBuffer</span> = <span class="keyword">await</span> <span class="title class_">PAGData</span>.<span class="title function_">arrayBuffer</span>();</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">PAGFile</span> = <span class="keyword">await</span> <span class="variable constant_">PAG</span>.<span class="property">PAGFile</span>.<span class="title function_">load</span>(<span class="title class_">PAGFileBuffer</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建 canvas</span></span><br><span class="line"><span class="keyword">const</span> canvasEl = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&quot;canvas&quot;</span>);</span><br><span class="line"><span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(canvasEl);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绘制画布（结束）</span></span><br><span class="line"><span class="keyword">const</span> <span class="title class_">PAGView</span> = <span class="keyword">await</span> <span class="variable constant_">PAG</span>.<span class="property">PAGView</span>.<span class="title function_">init</span>(<span class="title class_">PAGFile</span>, canvasEl);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="交互能力"><a href="#交互能力" class="headerlink" title="交互能力"></a>交互能力</h3><p>render-pag 用到的 libpag 功能如下（libpag 本身支持很多能力，可以在官网查看 PAGView Class 的方法）</p>
+<ul>
+<li>支持替换图片</li>
+<li>支持替换文字</li>
+<li>支持声音输出</li>
+<li>支持播放&#x2F;暂停&#x2F;指定播放次数</li>
+<li>设置播放进度&#x2F;获取播放进度</li>
+<li>获取动画总时长</li>
+<li>刷新当前帧</li>
+</ul>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><h4 id="wasm-文件加载"><a href="#wasm-文件加载" class="headerlink" title="wasm 文件加载"></a>wasm 文件加载</h4><ul>
+<li>加载慢：开启 Gzip。<ul>
+<li>wasm 文件有 2.9M，官方推荐开启 Gzip 并放到 CDN 上，以减少加载时间，或者让客户端缓存在本地。</li>
+</ul>
+</li>
+<li>按需加载：不支持。<ul>
+<li>绘制层的 wasm 是一个整体，并且已压缩到最小。</li>
+</ul>
+</li>
+</ul>
+<h4 id="卡顿-崩溃"><a href="#卡顿-崩溃" class="headerlink" title="卡顿 &amp; 崩溃"></a>卡顿 &amp; 崩溃</h4><ul>
+<li>受 PAG 渲染性能影响，不要在同屏播放多个 PAG 动画，否则动画会明显卡顿</li>
+<li>4.1.18 以下的老版本 libpag 会内存泄露使 Android、iOS Webview 崩溃，升级 4.2.x 以后问题得到解决</li>
+<li>不需要 ffavc 的场景则尽量不要使用 ffavc，额外 wasm  的文件引入也会占用内存</li>
+<li>加了特殊 AE 特效的 pag 文件在不建议在使用，在 Android 下会明显卡顿（需要 ffavc 解码器的动画同理）</li>
+<li>优化 pag 文件体积，过多的图层和位图的引入都会增加文件体积，同样会导致播放卡顿</li>
+</ul>
+<h4 id="动画导出"><a href="#动画导出" class="headerlink" title="动画导出"></a>动画导出</h4><ul>
+<li>使用 BMP 的动画导出后变糊了？<ul>
+<li>可以将 BMP 序列帧导出看成视频的每一帧导出，为了优化体积，PAG 会进行压缩，就像压缩图片那样。这就是为什么不用 BMP 的文件比较清晰，因为矢量图只需要记录路径，不需要对图片素材做处理</li>
+</ul>
+</li>
+<li>设计师导出的 pag 文件不是 30 帧或者 60 帧？<ul>
+<li>AE 插件导出默认为 24 帧，带 BMP 的最大 30 帧，不带 BMP 的最大 60帧</li>
+<li>（设计师在 AE 中预览的效果不代表最终在用户手机上的效果，由于帧数限制可能没有那么丝滑）</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/NodeJS/" rel="tag"># NodeJS</a>
+              <a href="/tags/%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/" rel="tag"># 开发小结</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/20/dweb-cli%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/" rel="prev" title="dweb-cli 开发小结">
+      <i class="fa fa-chevron-left"></i> dweb-cli 开发小结
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#libpag-%E8%B0%83%E7%A0%94"><span class="nav-number">1.</span> <span class="nav-text">libpag 调研</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%A1%A3"><span class="nav-number">2.</span> <span class="nav-text">文档</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">2.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">2.2.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="nav-number">2.3.</span> <span class="nav-text">兼容性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%98%E5%88%B6%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">绘制流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%A6%81%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">简要代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E4%BA%92%E8%83%BD%E5%8A%9B"><span class="nav-number">5.</span> <span class="nav-text">交互能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#wasm-%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD"><span class="nav-number">6.1.</span> <span class="nav-text">wasm 文件加载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%A1%E9%A1%BF-%E5%B4%A9%E6%BA%83"><span class="nav-number">6.2.</span> <span class="nav-text">卡顿 &amp; 崩溃</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E7%94%BB%E5%AF%BC%E5%87%BA"><span class="nav-number">6.3.</span> <span class="nav-text">动画导出</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
