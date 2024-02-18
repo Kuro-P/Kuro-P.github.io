@@ -4,9 +4,9 @@ date: 2023-12-28 13:57:55
 tags: [JavaScript ,NodeJS, 开发小结]
 categories: [前端]
 ---
-去年设计部门与客户端团队落地了一项新的动画方案: libpag，是腾讯开源的一个全平台动效插件。公司内还剩前端组未接入，正好去年年中有个需求需要用到 pag 动画，简单用了一下并封装成 js 库方便组内调用。
+去年设计部门与客户端团队落地了一项新的动画方案: libpag，是腾讯开源的一个全平台动效插件。
+正好去年年中有个前端需求需要用到 pag 动画，调研后封装成库方便组内调用。
 今年主要是维护和修 bug，并支持了 React 组件渲染。 
-（emmm 这也是一篇本该属于2022年完成的文章...）
 
 <!-- more -->
 
@@ -14,7 +14,7 @@ categories: [前端]
 libpag 核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL实现，最终生成的动画文件是二进制文件，所以在体积上很占优势。
 引入时需要引入 `libpag.js` 和 `libpag.wasm` 两个文件。
 
-### 相关文档
+### 文档
 官方文档  https://pag.art <br/>
 Github https://github.com/Tencent/libpag <br/>
 Github demo https://github.com/libpag/pag-web <br/>
