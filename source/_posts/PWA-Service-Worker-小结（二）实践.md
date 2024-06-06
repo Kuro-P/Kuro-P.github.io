@@ -27,17 +27,37 @@ Service Worker 的初衷是极致优化用户体验，带来丝滑般流畅的�
 ### 三、Service Worker 安装注册
 #### 注册文件
 ````javascript
-// service worker 注册文件
 if ('serviceWorker' in window.navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' })
-    .then(function (reg) {
-      console.log('success', reg);
-    })
-    .catch(function (err) {
-      console.log('fail', err);
-    });
-
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(function (reg) {
+          console.log('success', reg);
+        })
+        .catch(function (err) {
+          console.log('fail', err);
+        });
+}
 ````
+
+#### 注销文件
+````javascript
+if ('serviceWorker' in window.navigator) {
+    navigator.serviceWorker.getRegistrations.then(function (registrations) {
+        //returns installed service workers
+        if (registrations.length) {
+          for(let registration of registrations) {
+            registration.unregister().then(ret => {
+                console.log(
+                    'Unregister Service Worker[' +
+                    settings.serviceWorkerUrl +
+                    ']: ' + ret
+                )
+            })
+          }
+        }
+    })
+}
+````
+
 register 方法接受两个参数，第一个是 service worker 文件的路径，第二个参数是 Serivce Worker 的配置项，可选填，其中比较重要的是 __scope__ 属性。
 
 #### 拓展 Service Worker 作用域
@@ -68,12 +88,10 @@ app.use(serveStatic(`${sourceRoot}/home`, {
 以 gulp 为例，使用 [`sw-precache`](https://github.com/GoogleChromeLabs/sw-precache) 插件生成注册文件：
 ````javascript
 gulp.task('generate-service-worker', function(callback) {
-
     swPrecache.write('./service-worker.js', {
         staticFileGlobs: ['./build/public' + '/**/*.{js,css,png,jpg,webp,gif,svg,eot,ttf,woff}'],
         stripPrefix: './build'
     }, callback);
-
 });
 ````
 
@@ -91,29 +109,33 @@ gulp.task('generate-service-worker', function(callback) {
 2. __`public/*` 无法匹配public路径下的所有文件， addCaches 时只能写fileName？__
 原因：service worker 没有通配符 * 这个概念，`/sw-test/` 这个 path 只是让 sw 寻找缓存时的一个入口，用以区分各个路径的缓存（[详情](https://stackoverflow.com/questions/46830493/is-there-any-way-to-cache-all-files-of-defined-folder-path-in-service-worker)）；
 解决方案：service-worker.js 使用官方的 `sw-precache` 插件生成（[详情](https://stackoverflow.com/questions/46208326/for-serviceworker-cache-addall-how-do-the-urls-work/46213137#46213137)）；
-3. __如果 service worker 缓存的了全部的js和img 会不会导致 cacheStorage 很占用用户的系统空间？__
-不会，各个浏览器分配给各站点的 cacheStorrage 的值不一样，同时也受用户设备空间影响。
+3. __如果 service worker 缓存的了全部的 js 和 img 会不会导致 cacheStorage 很占用用户的系统空间？__
+不会，cacheStorage 的值不是无限大的。虽然各个浏览器分配给各站点的 cacheStorrage 的值不一样，同时也受用户设备空间影响。
 
 ### 落地情况
-个人觉得 Service Worker 更适合在单页应用、文档类应用的等场景使用，才能把离线缓存的优势发挥出来。比如 [Vue](https://cn.vuejs.org/) 的官网。<hr/>
+还是觉得 Service Worker 最适合在 SPA、文档类应用的等场景使用，才能把离线缓存的优势发挥出来。比如 [Vue](https://cn.vuejs.org/) 的官网。<hr/>
 *2019.4.23*
 未落地。主要原因有两点： 
-1. 工作中想要使用 Service worker 提供离线缓存服务的是一个负责 APP 内嵌页面的 H5 站点，HTML都是动态渲染的，活动数据是实时的，不能离线访问；
+1. 工作中想要使用 Service worker 提供离线缓存服务的是一个负责 APP 内嵌页面的 H5 站点，HTML都是动态渲染的，活动数据是实时性较强，缓存数据意义不大；
 2. 这个站点的页面入口都是几乎都是单独的活动页，没有一个统一 sw 注册的入口；
 
 <hr/>
+
 *2020.3.16*
 重新看这篇文章的时候，如果在几个主要的活动入口页引入 sw 的注册文件，那么这几个长期的活动就可以应用 sw 缓存了，但这并没有覆盖全站，所以依然不是好的解决方案。
+
+*2024.5.9*
+查了下现公司的使用方式，在主页注册，pv/uv 高的页面会使用 Service Worker 拦截请求将响应缓存到 indexDB 中。
 
 ### 应用场景
 这部分总结摘录自这篇文章：[Service Worker 从入门到出门](https://juejin.im/post/5d26aec1f265da1ba56b47ea#heading-6)
 
 * 网站功能趋于稳定：频繁迭代的网站似乎不方便加 Service Worker。
 * 网站需要拥有大量用户：管理后台、OA系统等场景似乎不是很有必要加 Service Worker。
-* 网站真的在追求用户体验：Bug 多多、脸不好看的网站似乎不是很有必要加 Service Worker。
-* 网站用户体验关乎用户留存：12306 似乎完全不需要加 Service Worker。
+* 网站真的在追求用户体验：优先保证网站其他功能正常运行，在此基础上引入 SW 来优化加载体验。
+* 网站用户体验关乎用户留存：体验优先于功能。
   
-简单总结：Service Worker 的初衷是极致优化用户体验，是用来锦上添花的，技术只是技术，但实际应用前，应考虑成本和收益。
+简单总结：Service Worker 在实际应用前，应考虑成本和收益，不要为了用技术而用技术。
 
 ### 参考链接
 * [Service Worker ——这应该是一个挺全面的整理](https://juejin.im/post/5b06a7b3f265da0dd8567513#heading-1)
