@@ -68,9 +68,6 @@ dweb export <configType> # 导出 cli 中的某项配置到当前目录
    
 #### 模板目录结构
 ```
-├── README.md
-├── deploy.config.js
-├── package.json
 ├── src
 │   ├── common
 │   │   ├── assets
@@ -93,6 +90,8 @@ dweb export <configType> # 导出 cli 中的某项配置到当前目录
 │           └── style.scss
 ├── tsconfig.json
 ├── webpack.config.js
+├── package.json
+├── README.md
 └── yarn.lock
 ```
    
