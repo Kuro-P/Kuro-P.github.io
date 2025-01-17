@@ -18,7 +18,7 @@ categories: git
 * 由于 ssh 连接默认查找的都是私钥路径为 ~/.ssh/id_rsa，所以需要为 github 手动指明所需私钥 github_rsa，否则会报错 Permission denied (publickey) 
 * 在 `~/.ssh`下创建一个 config 文件，添加配置：
 ````
-Host github
+Host github.com
     Hostname ssh.github.com
     Port 443
     User git
