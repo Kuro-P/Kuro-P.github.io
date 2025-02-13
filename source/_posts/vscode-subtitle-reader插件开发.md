@@ -64,11 +64,11 @@ vscode 官方提供的命令行工具 vsce 可将项目代码打包成 `.vsix` �
 }
 
 ```
-两部分编译，extension 打包应用相关代码，webview 打包相关静态文件，最终都输出到 `\dist` 路径下。
+两部分编译，extension 打包应用相关代码，webview 打包相关静态文件，最终都输出到 `/dist` 路径下。
 
 ##### extension 编译
 ```sh
-extension.ts # 扩展 / 打包入口文件，所需功能接口 & 命令注册
+extension.ts # 扩展打包入口文件，所需功能接口 & 命令注册
 ```
 dev: 开发模式下会自动打开新的 vscode 调试窗口和测试文件，不支持热更新；
 prod: webpack 将以上文件打包到输出路径；
