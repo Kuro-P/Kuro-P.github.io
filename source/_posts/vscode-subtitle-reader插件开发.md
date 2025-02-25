@@ -1,5 +1,5 @@
 ---
-title: vscode-subtitle-reader插件开发
+title: vscode-subtitle-reader 插件开发
 date: 2024-11-16 23:30:46
 ---
 一个 vscode 插件开发记录，主要是用来满足自己阅读字幕文本的需要。
