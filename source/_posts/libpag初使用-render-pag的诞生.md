@@ -35,45 +35,94 @@ PAG 的核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL 实
 
 __公司客户端需要兼容到 IOS >= 11、Android >= 5，针对不支持 pag 动画播放的设备将显示静态图片__
 
-### 二、render-pag 封装
+### 二、render-pag 的封装
+
+`render-pag` 将 PAG 相关依赖加载过程进行封装，使调用方无需再关注动画参数以外的细枝末节。同时得益于 PAG 本身提供的大量灵活 API，多种自由组合组成多种交互。
+
+#### 使用场景
+__场景一__ ：虚拟形象，4500ms 的 PAG 文件，每 500ms 为一个新的状态（摆手、思考、开心、再见），根据用户交互播放不同片段 [0, 500]、[500, 1000]...
+
+__场景二__ ：可复用的特效弹层，更改数值/图片，再次播放
+
+#### 配置项
+```ts
+export interface Config {
+  // 需要挂载的目标元素
+  container: HTMLElement;
+  // pag 素材地址
+  pagUrl: string;
+  // libpag.wasm 文件地址（未设置将使用默认值）
+  wasmUrl?: string;
+  // ffavc.wasm 文件地址（未设置将使用默认值）
+  ffavcWasmUrl?: string;
+  // 是否开启 ffavc 解码（针对微信环境或者对含有 BMP序列帧的文件使用）
+  enableFFAVC?: boolean;
+  // 不支持 pag 播放或者 pag 加载失败时的默认展示图片
+  defaultPic?: string;
+  // 画布宽度
+  width?: number;
+  // 画布高度
+  height?: number;
+  // 加载完成是否自动播放
+  autoPlay?: boolean;
+  // 是否循环播放动画
+  isInfinite?: boolean;
+  // 是否显示加载动画
+  showLoading?: boolean;
+  // 加载动画配置
+  loadingConfig?: LoadingConfig;
+  // PAG 实例初始化前的回调函数（通常用来替换图片/文字）
+  beforePAGInit?: (view: PAGView) => void;
+  // PAG 实例初始化完成的回调
+  onPAGInitialized?: (PAG: PAGInstance) => void;
+}
+```
+
 #### 渲染过程
 {% asset_img "render-pag渲染过程.png" 600 %}
 
-### 代码示意
-```js
-import { PAGInit } from "libpag";
+#### 核心代码
+```ts
+async function renderInit(config: Config): Promise<PAGInstance> {
+  // ...
+  const initList = [];
+  initList.push(initWasm({ wasmUrl, ffavcWasmUrl, enableFFAVC }));
+  initList.push(initPagFile(pagUrl));
 
-// 初始化 wasm 实例
-const PAG = await PAGInit();
+  const [PAG, pagFileBuffer] = await Promise.all(initList);
+  const PAGFile = await PAG.PAGFile.load(pagFileBuffer);
 
-// 初始化 pag 文件数据
-const PAGData = await fetch(pagUrl);
-const PAGFileBuffer = await PAGData.arrayBuffer();
-const PAGFile = await PAG.PAGFile.load(PAGFileBuffer);
+  const PAGInstance = await PAG.PAGView.init(PAGFile, canvasEl);
+  return PAGInstance;
+}
 
-// 创建 canvas
-const canvasEl = document.createElement("canvas");
-document.body.appendChild(canvasEl);
 
-// 绘制画布（结束）
-const PAGView = await PAG.PAGView.init(PAGFile, canvasEl);
+// 加载 wasm 文件
+async function initWasm(
+  config: {
+    wasmUrl?: string;
+    ffavcWasmUrl?: string;
+    enableFFAVC?: boolean;
+  } = {},
+): Promise<PAG> {
+  const PAG = await PAGInit({ locateFile: () => wasmUrl });
+  if (enableFFAVC) {
+    const FFAVC = await FFAVCInit({ locateFile: () => ffavcWasmUrl });
+    const ffavcDecoderFactory = new FFAVC.FFAVCDecoderFactory();
+    PAG.registerSoftwareDecoderFactory(ffavcDecoderFactory);
+  }
+  return PAG;
+}
 
+// 加载 PAG 素材
+async function initPagFile(url: string): Promise<ArrayBuffer> {
+  const data = await fetch(url);
+  const buffer = await data.arrayBuffer();
+  return buffer;
+}
 ```
 
-### 三、交互能力
-render-pag 显式支持的交互如下，主要组合了原有的实例方法、封装成常用的交互方式。
-
-- 播放/暂停
-- 指定播放次数
-- 设置播放进度/获取播放进度
-- 播放某段时间片/多段时间片
-- 替换图片、文字
-- 获取动画总时长
-- 刷新当前帧
-
-*注：PAG 本身提供了很多 API，可在官网查看 PAGView Class 相关文档。*
-
-### 四、常见问题
+### 三、常见问题
 #### 卡顿 & 崩溃
 - 受 PAG 渲染性能影响，同屏播放多个 PAG 动画，动画会明显卡顿
 - 4.1.18 以下的老版本 libpag 内存泄露会使 Android、iOS Webview 崩溃，尽量升级版本到 4.2.x
@@ -88,8 +137,11 @@ render-pag 显式支持的交互如下，主要组合了原有的实例方法、
   - 设计师在 AE 中预览的效果不代表最终在手机呈现上的效果，由于帧数限制可能没有那么丝滑
 - 导出的动画播放结束后会闪烁
   - 设计师在 AE 工程中最后的关键帧可能填充了黑色
+#### 版本相关
+- wasm 文件主版本需要与 PAG 主版本相对应，否则渲染报错
+- 浏览器是否支持，需要自行判断当前环境是否支持 WebAssembly、WebGL
 
-### 五、相关文档
+### 四、相关文档
 - 官方文档：https://pag.art
 - Github：https://github.com/Tencent/libpag
 - Web demo：https://github.com/libpag/pag-web
