@@ -7,7 +7,6 @@
     "dev": "hexo server",
     "build": "hexo douban && hexo generate",
     "deploy": "hexo deploy",
-    "deploy-private": "sh deploy/build.sh",
     "douban": "hexo douban"
   },
   "hexo": {
