@@ -1,22 +1,39 @@
 ---
-title: PAG 使用 & render-pag 的诞生
+title: PAG 移动端动效方案
 date: 2023-12-28 13:57:55
 tags: [JavaScript ,NodeJS, 开发小结]
 categories: [前端]
 ---
-去年设计部门与客户端团队引入了一项新的动画方案: PAG。这是一个腾讯开源的多端动画库，适用于 iOS、Android、Web。恰逢有个需求要用到，正式引到前端项目中使用。调研后封装成库（render-pag）方便组内成员调用。
+去年设计部门与客户端团队引入了腾讯新开源的 PAG 动画方案，用于在移动端展示复杂动画，其适用于 iOS、Android、Web、小程序等多个平台。稳定可行后，正式引到前端项目中使用。调研后封装成库（render-pag）方便组内成员调用。
 
 <!-- more -->
 
 ### 一、 调研
-[PAG](https://pag.art) 动效的制作由设计师在 AE 中完成，使用官方提供 AE 插件导出 `.pag` 文件给到工程师。下载官方工具 __PAGViewer__ 对 `.pag` 文件进行预览。
+[PAG](https://pag.art) 官方提供三个工具：
+- 面向设计师：__PAG AE 插件__ ，用于导出动画文件；
+- 面向设计师&开发者：__PAG Viewer 应用__ ，用于预览动画文件；
+- 面向开发者：__PAG SDK__ ，项目代码中引用，用于解析、渲染动画文件；
 
-PAG 的核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL 实现，最终生成的动画文件是二进制文件。使用时需要在页面中引入 `libpag.js` 和 `libpag.wasm` 两个文件。
+#### 工作流
+设计师在 AE 中完成动效设计，使用 PAG AE 插件导出动效文件（`.pag`）。开发者拿到动效文件后在 PAG Viewer 中进行预览，无问题后在项目中引入相关 SDK 及动效文件即可。
+
+#### 兼容性
+PAG 核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL 实现，最终生成的动画文件是二进制文件。使用时需要在页面中引入 `libpag.js` 和 `libpag.wasm` 两个文件。
+
+PAG 依赖 WebGL，需确保目标环境支持。
+
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome for Android | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari on iOS |
+| --------- | --------- | --------- | --------- |
+| Chrome >= 69| Safari >= 11.3 | Android >= 7.0 | iOS >= 11.3 |
+
+__公司客户端需要兼容到 IOS >= 11、Android >= 5，针对不支持 PAG 的设备将显示静态图片__
+
+### 二、优缺点
 
 #### 优点
-- 动画文件为二进制，体积相比于 json 小很多，且不用考虑图片文件外挂的问题（如 Lottie Web）
-- 利用 canvas 标签播放，移动端无需用户手动触发
-- 动画文件内容可编辑、素材时长均可控
+- 二进制动画文件，体积比传统 json 动画小很多，且不用考虑图片文件外挂的问题（如 Lottie Web）
+- 使用 canvas 标签实现播放，移动端无需用户手动触发
+- 动画文件内容可编辑、素材时长均可控，API 灵活
 - 矢量图层/动画性能优秀
 - 跨平台支持性好
 
@@ -26,18 +43,11 @@ PAG 的核心代码为 C++ 代码，其 Web 端是基于 WebAssembly + WebGL 实
 - 复杂 AE 特效需要引入额外依赖
   - 包含 BMP 序列帧的动画会依赖 video 标签，需要引入官方的解码器 ffavc.wasm
 - 代码层调用结束后需要手动销毁实例
-  - 以解除 JS 对 wasm 导出对象的引用，调用 PagFile.destory()
-
-#### 兼容性
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome for Android | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari on iOS |
-| --------- | --------- | --------- | --------- |
-| Chrome >= 69| Safari >= 11.3 | Android >= 7.0 | iOS >= 11.3 |
-
-__公司客户端需要兼容到 IOS >= 11、Android >= 5，针对不支持 pag 动画播放的设备将显示静态图片__
+  - 以解除 JS 对 wasm 导出对象的引用，需调用 PagFile.destory()
 
 ### 二、render-pag 的封装
 
-`render-pag` 将 PAG 相关依赖加载过程进行封装，使调用方无需再关注动画参数以外的细枝末节。同时得益于 PAG 本身提供的大量灵活 API，多种自由组合组成多种交互。
+`render-pag` 将 PAG 依赖加载过程进行封装，使调用方无需再关注动画参数以外的细节。同时得益于 PAG 本身提供的大量灵活 API，交互效果可自由组合。
 
 #### 使用场景
 __场景一__ ：虚拟形象，4500ms 的 PAG 文件，每 500ms 为一个新的状态（摆手、思考、开心、再见），根据用户交互播放不同片段 [0, 500]、[500, 1000]...
@@ -77,9 +87,6 @@ export interface Config {
   onPAGInitialized?: (PAG: PAGInstance) => void;
 }
 ```
-
-#### 渲染过程
-{% asset_img "render-pag渲染过程.png" 600 %}
 
 #### 核心代码
 ```ts
@@ -122,6 +129,9 @@ async function initPagFile(url: string): Promise<ArrayBuffer> {
 }
 ```
 
+#### 渲染过程
+{% asset_img "render-pag渲染过程.png" 600 %}
+
 ### 三、常见问题
 #### 卡顿 & 崩溃
 - 受 PAG 渲染性能影响，同屏播放多个 PAG 动画，动画会明显卡顿
@@ -146,3 +156,5 @@ async function initPagFile(url: string): Promise<ArrayBuffer> {
 - Github：https://github.com/Tencent/libpag
 - Web demo：https://github.com/libpag/pag-web
 
+### 其他
+2025.8.6 支付宝的集五福动效方案 Galacean Effect，是一套蚂蚁自研的 Lottie-Like 动效工具。动效交付文件同样为 `json`，相对于 Lottie，支持了更多高级效果（如粒子）。
