@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="自 ECMA2015 (6th) 大幅更新之后, ECMA 标准变更成每年6月发布一个版本进行小幅度更新。为方便温习和查找，汇总一下近五年的所有版本特性。本文共涵盖了 ES2016、ES2017、ES2018、ES2019、ES2020 五个版本的更新内容。翻译有删改，仅供快速查找使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】从 ES2016 到 ES2020 的所有特性">
+<meta property="og:url" content="http://yoursite.com/2020/07/23/%E3%80%90%E8%AF%91%E3%80%91%E4%BB%8E-ES2016-%E5%88%B0-ES2020-%E7%9A%84%E6%89%80%E6%9C%89%E7%89%B9%E6%80%A7/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="自 ECMA2015 (6th) 大幅更新之后, ECMA 标准变更成每年6月发布一个版本进行小幅度更新。为方便温习和查找，汇总一下近五年的所有版本特性。本文共涵盖了 ES2016、ES2017、ES2018、ES2019、ES2020 五个版本的更新内容。翻译有删改，仅供快速查找使用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-23T02:24:10.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.694Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/07/23/%E3%80%90%E8%AF%91%E3%80%91%E4%BB%8E-ES2016-%E5%88%B0-ES2020-%E7%9A%84%E6%89%80%E6%9C%89%E7%89%B9%E6%80%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【译】从 ES2016 到 ES2020 的所有特性 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/23/%E3%80%90%E8%AF%91%E3%80%91%E4%BB%8E-ES2016-%E5%88%B0-ES2020-%E7%9A%84%E6%89%80%E6%9C%89%E7%89%B9%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【译】从 ES2016 到 ES2020 的所有特性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-23 10:24:10 10:24:10" itemprop="dateCreated datePublished" datetime="2020-07-23T10:24:10+08:00">2020-07-23 10:24:10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/JavaScript/" itemprop="url" rel="index"><span itemprop="name">JavaScript</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>自 ECMA2015 (6th) 大幅更新之后, ECMA 标准变更成每年6月发布一个版本进行小幅度更新。为方便温习和查找，汇总一下近五年的所有版本特性。本文共涵盖了 ES2016、ES2017、ES2018、ES2019、ES2020 五个版本的更新内容。翻译有删改，仅供快速查找使用。</p>
+<span id="more"></span>
+
+<h3 id="前言：关于ECMA"><a href="#前言：关于ECMA" class="headerlink" title="前言：关于ECMA"></a>前言：关于ECMA</h3><p>ECMA 相关stage-x 处于某个阶段，描述的是 ECMA 标准相关的内容。根据提案划分界限，stage-x 大致分为以下阶段:</p>
+<ul>
+<li>stage-0：还是一个设想，只能由 TC39 成员或 TC39 贡献者提出。</li>
+<li>stage-1：提案阶段，比较正式的提议，只能由 TC39 成员发起，这个提案要解决的问题必须有正式的书面描述。</li>
+<li>stage-2：草案，有了初始规范，必须对功能语法和语义进行正式描述，包括一些实验性的实现。</li>
+<li>stage-3：候选，该提议基本已经实现，需要等待实验验证，用户反馈及验收测试通过。</li>
+<li>stage-4：已完成，必须通过 Test262 验收测试，下一步就纳入 ECMA 标准。</li>
+</ul>
+<p>总结起来就是数字越大，越成熟。</p>
+<h3 id="ES2016-新特性"><a href="#ES2016-新特性" class="headerlink" title="ES2016 新特性"></a>ES2016 新特性</h3><p>ES2016 只更新了两个特性：</p>
+<ul>
+<li>Array.prototype.includes()</li>
+<li>指数运算符</li>
+</ul>
+<h4 id="Array-prototype-includes"><a href="#Array-prototype-includes" class="headerlink" title="Array.prototype.includes()"></a>Array.prototype.includes()</h4><p>该方法用于检测数组中是否包含某个值，包含则返回 true，否则返回 false。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> array = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">2</span>);</span><br><span class="line"><span class="comment">// true</span></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">3</span>);</span><br><span class="line"><span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结合 fromIndex 使用：</p>
+</blockquote>
+<p>可以为 <code>.includes()</code> 提供一个起始索引，默认是 0，接受负数值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> array = [ <span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span> ];</span><br><span class="line"></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">3</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">// find the number 3 starting from array index 1</span></span><br><span class="line"><span class="comment">// true</span></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">5</span>, <span class="number">4</span>);</span><br><span class="line"><span class="comment">//false</span></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">1</span>, -<span class="number">1</span>);</span><br><span class="line"><span class="comment">// find the number 1 starting from the ending of the array going backwards</span></span><br><span class="line"><span class="comment">// false</span></span><br><span class="line">array.<span class="title function_">includes</span>(<span class="number">11</span>, -<span class="number">3</span>);</span><br><span class="line"><span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="指数操作符"><a href="#指数操作符" class="headerlink" title="指数操作符 (**)"></a>指数操作符 (**)</h4><p>在 ES2016 前我们会这样写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Math</span>.<span class="title function_">pow</span>(<span class="number">2</span>, <span class="number">2</span>);</span><br><span class="line"><span class="comment">// 4</span></span><br><span class="line"><span class="title class_">Math</span>.<span class="title function_">pow</span>(<span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line"><span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+
+<p>现在，有了指数运算符之后，可以这样写：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span> ** <span class="number">2</span>;</span><br><span class="line"><span class="comment">// 4</span></span><br><span class="line"><span class="number">2</span> ** <span class="number">3</span>;</span><br><span class="line"><span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+<p>这在多次操作指数运算的时候很有用：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span> ** <span class="number">2</span> ** <span class="number">2</span></span><br><span class="line"><span class="comment">// 16</span></span><br><span class="line"><span class="title class_">Math</span>.<span class="title function_">pow</span>(<span class="title class_">Math</span>.<span class="title function_">pow</span>(<span class="number">2</span>, <span class="number">2</span>), <span class="number">2</span>);</span><br><span class="line"><span class="comment">// 16</span></span><br></pre></td></tr></table></figure>
+<p><code>Math.pow()</code> 需要连续调用，这会使代码看起来很长不宜阅读。使用指数运算符的方式更快更简洁。</p>
+<h3 id="ES2017-新特性"><a href="#ES2017-新特性" class="headerlink" title="ES2017 新特性"></a>ES2017 新特性</h3><p>ES2017 介绍了更多新特性，如 String padding，Object.entries(), Object.values(), 原子性操作， 以及 Async、Await 等。</p>
+<h4 id="字符串填充-String-padStart-和-String-padEnd"><a href="#字符串填充-String-padStart-和-String-padEnd" class="headerlink" title="字符串填充 ( String.padStart() 和 String.padEnd() )"></a>字符串填充 ( String.padStart() 和 String.padEnd() )</h4><p><code>.padStart()</code> 对字符串头部进行填充， <code>.padEnd()</code> 对字符串尾部进行填充：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;hello&quot;</span>.<span class="title function_">padStart</span>(<span class="number">6</span>);</span><br><span class="line"><span class="comment">// &quot; hello&quot;</span></span><br><span class="line"><span class="string">&quot;hello&quot;</span>.<span class="title function_">padEnd</span>(<span class="number">6</span>);</span><br><span class="line"><span class="comment">// &quot;hello &quot;</span></span><br></pre></td></tr></table></figure>
+<p>为什么只填充1个空格而不是6个？是因为 “hello” 一共是五个字符，而 <code>.padStart</code> 和 <code>.padEnd</code> 的入参是填充后的字符串长度，所以之只会填充一个空格。 </p>
+<blockquote>
+<p>使用 padStart 实现文本右对齐</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> strings = [<span class="string">&quot;short&quot;</span>, <span class="string">&quot;medium length&quot;</span>, <span class="string">&quot;very long string&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> longestString = strings.<span class="title function_">sort</span>(<span class="function">(<span class="params">s1, s2</span>) =&gt;</span> s2.<span class="property">length</span> - s1.<span class="property">length</span>).<span class="title function_">map</span>(<span class="function"><span class="params">str</span> =&gt;</span> str.<span class="property">length</span>)[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">strings.<span class="title function_">forEach</span>(<span class="function"><span class="params">str</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(str.<span class="title function_">padStart</span>(longestString)));</span><br><span class="line"></span><br><span class="line"><span class="comment">// very long string</span></span><br><span class="line"><span class="comment">//    medium length</span></span><br><span class="line"><span class="comment">//            short</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>第一步获取了数组中最长字符串的长度，接下来用该长度填充数组中的每个字符串，即打印出一组右对齐的字符串。</p>
+<blockquote>
+<p>自定义填充值</p>
+</blockquote>
+<p>除了默认的空格，还可以使用字符串和数字进行填充。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;hello&quot;</span>.<span class="title function_">padEnd</span>(<span class="number">13</span>,<span class="string">&quot; Alberto&quot;</span>);</span><br><span class="line"><span class="comment">// &quot;hello Alberto&quot;</span></span><br><span class="line"><span class="string">&quot;1&quot;</span>.<span class="title function_">padStart</span>(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// &quot;001&quot;</span></span><br><span class="line"><span class="string">&quot;99&quot;</span>.<span class="title function_">padStart</span>(<span class="number">3</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// &quot;099&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Object-entries-和-Object-values"><a href="#Object-entries-和-Object-values" class="headerlink" title="Object.entries() 和 Object.values()"></a>Object.entries() 和 Object.values()</h4><p>首先创建一个Object：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> family = &#123;</span><br><span class="line">  <span class="attr">father</span>: <span class="string">&quot;Jonathan Kent&quot;</span>,</span><br><span class="line">  <span class="attr">mother</span>: <span class="string">&quot;Martha Kent&quot;</span>,</span><br><span class="line">  <span class="attr">son</span>: <span class="string">&quot;Clark Kent&quot;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上个版本的 javascript 中，我们可以使用如下方式获取 Object 中的值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">keys</span>(family);</span><br><span class="line"><span class="comment">// [&quot;father&quot;, &quot;mother&quot;, &quot;son&quot;]</span></span><br><span class="line">family.<span class="property">father</span>;</span><br><span class="line"><span class="string">&quot;Jonathan Kent&quot;</span></span><br></pre></td></tr></table></figure>
+<p><code>Object.keys()</code> 仅会返回对象中所有的键名。</p>
+<p>现在又多了两种可以访问对象的方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">values</span>(family);</span><br><span class="line"><span class="comment">// [&quot;Jonathan Kent&quot;, &quot;Martha Kent&quot;, &quot;Clark Kent&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">entries</span>(family);</span><br><span class="line"><span class="comment">// [&quot;father&quot;, &quot;Jonathan Kent&quot;]</span></span><br><span class="line"><span class="comment">// [&quot;mother&quot;, &quot;Martha Kent&quot;]</span></span><br><span class="line"><span class="comment">// [&quot;son&quot;, &quot;Clark Kent&quot;]</span></span><br></pre></td></tr></table></figure>
+<p><code>Object.values()</code> 以数组形式返回对象所有值。<br><code>Object.entries()</code> 同样以数组形式返回对象中的键值对。</p>
+<h4 id="Object-getOwnPropertyDescriptors"><a href="#Object-getOwnPropertyDescriptors" class="headerlink" title="Object.getOwnPropertyDescriptors()"></a>Object.getOwnPropertyDescriptors()</h4><p>这个方法会返回对象所有自身属性的描述。描述性的字段有：<code>value</code>，<code>writable</code>, <code>get</code>, <code>set</code>, <code>configurable</code> 和 <code>enumerable</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myObj = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&quot;Alberto&quot;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">25</span>,</span><br><span class="line">  <span class="title function_">greet</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">getOwnPropertyDescriptors</span>(myObj);</span><br><span class="line"><span class="comment">// age: &#123;value: 25, writable: true, enumerable: true, configurable: true&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// greet: &#123;value: ƒ, writable: true, enumerable: true, configurable: true&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// name: &#123;value: &quot;Alberto&quot;, writable: true, enumerable: true, configurable: true&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="尾行逗号"><a href="#尾行逗号" class="headerlink" title="尾行逗号"></a>尾行逗号</h4><p>这仅仅是语法上的一个小改变。现在在写 Object 属性值时，我们可以在每个值后边加上一个逗号，不论它是否是最后一个。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from this</span></span><br><span class="line"><span class="keyword">const</span> object = &#123;</span><br><span class="line">  <span class="attr">prop1</span>: <span class="string">&quot;prop&quot;</span>,</span><br><span class="line">  <span class="attr">prop2</span>: <span class="string">&quot;propop&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// to this</span></span><br><span class="line"><span class="keyword">const</span> object = &#123;</span><br><span class="line">  <span class="attr">prop1</span>: <span class="string">&quot;prop&quot;</span>,</span><br><span class="line">  <span class="attr">prop2</span>: <span class="string">&quot;propop&quot;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意上述第二个例子中的最后一个逗号，即使你不写它也不会报错，只是写上会更方便的开发者们协作。</p>
+<h4 id="共享内存和原子性操作"><a href="#共享内存和原子性操作" class="headerlink" title="共享内存和原子性操作"></a>共享内存和原子性操作</h4><p>下述引自 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics">MDN</a>:</p>
+<blockquote>
+<p>多个共享内存的线程能够同时读写同一位置上的数据。原子操作会确保正在读或写的数据的值是符合预期的，即下一个原子操作一定会在上一个原子操作结束后才会开始，其操作过程不会中断。</p>
+</blockquote>
+<p>这些原子操作属于 Atomics 模块。与一般的全局对象不同，Atomics 不是构造函数，因此不能使用 new 操作符调用，也不能将其当作函数直接调用。Atomics 的所有属性和方法都是静态的（与 Math  对象一样）。</p>
+<p>方法示例：</p>
+<ul>
+<li>add &#x2F; sub</li>
+<li>and &#x2F; or &#x2F; xor</li>
+<li>load &#x2F; store</li>
+</ul>
+<p><code>Atomics</code> 通常和 <code>SharedArrayBuffer</code> 对象（通用的固定长度二进制数据缓冲区）一起使用。<br>来看一下几个 <code>Atomics</code>方法的使用示例：</p>
+<h5 id="Atomics-add-Atomics-sub-Atomics-load-and-Atomics-store"><a href="#Atomics-add-Atomics-sub-Atomics-load-and-Atomics-store" class="headerlink" title="Atomics.add(), Atomics.sub(), Atomics.load(), and Atomics.store()"></a>Atomics.add(), Atomics.sub(), Atomics.load(), and Atomics.store()</h5><p><code>Atomics.add()</code> 共接受三个参数：array、index、value。并返回该索引在执行操作前的值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// create a `SharedArrayBuffer`</span></span><br><span class="line"><span class="keyword">const</span> buffer = <span class="keyword">new</span> <span class="title class_">SharedArrayBuffer</span>(<span class="number">16</span>);</span><br><span class="line"><span class="keyword">const</span> uint8 = <span class="keyword">new</span> <span class="title class_">Uint8Array</span>(buffer);</span><br><span class="line"></span><br><span class="line"><span class="comment">// add a value at the first position</span></span><br><span class="line">uint8[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Atomics</span>.<span class="title function_">add</span>(uint8, <span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line"><span class="comment">// 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 10 + 5 = 15</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(uint8[<span class="number">0</span>])</span><br><span class="line"><span class="comment">// 15</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Atomics</span>.<span class="title function_">load</span>(uint8, <span class="number">0</span>));</span><br><span class="line"><span class="comment">// 15</span></span><br></pre></td></tr></table></figure>
+
+<p>要从数组中检索特定的值，可以使用 <code>Atomics.load()</code> 并传递两个参数，一个数组和一个索引。<br><code>Atomics.sub()</code> 的使用方式与 <code>Atomics.add()</code> 类似，只不过它是减去某个值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// create a `SharedArrayBuffer`</span></span><br><span class="line"><span class="keyword">const</span> buffer = <span class="keyword">new</span> <span class="title class_">SharedArrayBuffer</span>(<span class="number">16</span>);</span><br><span class="line"><span class="keyword">const</span> uint8 = <span class="keyword">new</span> <span class="title class_">Uint8Array</span>(buffer);</span><br><span class="line"></span><br><span class="line"><span class="comment">// add a value at the first position</span></span><br><span class="line">uint8[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Atomics</span>.<span class="title function_">sub</span>(uint8, <span class="number">0</span>, <span class="number">5</span>));</span><br><span class="line"><span class="comment">// 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 10 - 5 = 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(uint8[<span class="number">0</span>])</span><br><span class="line"><span class="comment">// 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Atomics</span>.<span class="title function_">store</span>(uint8, <span class="number">0</span>, <span class="number">3</span>));</span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Atomics</span>.<span class="title function_">load</span>(uint8, <span class="number">0</span>));</span><br><span class="line"><span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+<p>上述示例调用 <code>Atomics.sub()</code> 方法，实现 unit8[0] - 5 ，相当于 10 - 5。如同 <code>Atomics.add()</code> 一样，该方法也会返回数组中该索引在执行操作前的值。</p>
+<p>使用 <code>Atomics.store()</code> 来存储一个值，使用 <code>Atomics.load()</code> 来加载一个值。</p>
+<h5 id="Atomics-and-Atomics-or-Atomics-xor"><a href="#Atomics-and-Atomics-or-Atomics-xor" class="headerlink" title="Atomics.and(), Atomics.or(), Atomics.xor()"></a>Atomics.and(), Atomics.or(), Atomics.xor()</h5><p>这三个方法都在数组的给定位置执行按位的 AND、OR 和 XOR 操作。不再赘述。</p>
+<h4 id="Async-和-Await"><a href="#Async-和-Await" class="headerlink" title="Async 和 Await"></a>Async 和 Await</h4><p>ES2017 提供了两个操作 Promise 的新方法：”async&#x2F;await”。</p>
+<h5 id="回顾一下-Promise"><a href="#回顾一下-Promise" class="headerlink" title="回顾一下 Promise"></a>回顾一下 Promise</h5><p>在介绍新语法之前，让我们快速浏览下之前我们是怎么使用 Promise 的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fetch a user from github</span></span><br><span class="line"><span class="title function_">fetch</span>(<span class="string">&#x27;api.github.com/user/AlbertoMontalesi&#x27;</span>).<span class="title function_">then</span>( <span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// return the data in json format</span></span><br><span class="line">  <span class="keyword">return</span> res.<span class="title function_">json</span>();</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// if everything went well, print the data</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;).<span class="title function_">catch</span>( <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// or print the error</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>上述是一个非常简单的例子：请求一个 Github 用户的数据，并打印。下面来看个复杂点的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">walk</span>(<span class="params">amount</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &lt; <span class="number">500</span>) &#123;</span><br><span class="line">      reject (<span class="string">&quot;the value is too small&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="title function_">resolve</span>(<span class="string">`you walked for <span class="subst">$&#123;amount&#125;</span>ms`</span>),amount);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">walk</span>(<span class="number">1000</span>).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">500</span>);</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">700</span>);</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">800</span>);</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">100</span>);</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">400</span>);</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">walk</span>(<span class="number">600</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// you walked for 1000ms</span></span><br><span class="line"><span class="comment">// you walked for 500ms</span></span><br><span class="line"><span class="comment">// you walked for 700ms</span></span><br><span class="line"><span class="comment">// you walked for 800ms</span></span><br><span class="line"><span class="comment">// uncaught exception: the value is too small</span></span><br></pre></td></tr></table></figure>
+<p>来看下，如何用新语法 async &#x2F; await 来重写 <code>Promise</code>。</p>
+<h5 id="Async-和-Await-1"><a href="#Async-和-Await-1" class="headerlink" title="Async 和 Await"></a>Async 和 Await</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">walk</span>(<span class="params">amount</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (amount &lt; <span class="number">500</span>) &#123;</span><br><span class="line">      reject (<span class="string">&quot;the value is too small&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="title function_">resolve</span>(<span class="string">`you walked for <span class="subst">$&#123;amount&#125;</span>ms`</span>),amount);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// create an async function</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">go</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// use the keyword `await` to wait for the response</span></span><br><span class="line">  <span class="keyword">const</span> res = <span class="keyword">await</span> <span class="title function_">walk</span>(<span class="number">500</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  <span class="keyword">const</span> res2 = <span class="keyword">await</span> <span class="title function_">walk</span>(<span class="number">900</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res2);</span><br><span class="line">  <span class="keyword">const</span> res3 = <span class="keyword">await</span> <span class="title function_">walk</span>(<span class="number">600</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res3);</span><br><span class="line">  <span class="keyword">const</span> res4 = <span class="keyword">await</span> <span class="title function_">walk</span>(<span class="number">700</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res4);</span><br><span class="line">  <span class="keyword">const</span> res5 = <span class="keyword">await</span> <span class="title function_">walk</span>(<span class="number">400</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res5);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;finished&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">go</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// you walked for 500ms </span></span><br><span class="line"><span class="comment">// you walked for 900ms </span></span><br><span class="line"><span class="comment">// you walked for 600ms </span></span><br><span class="line"><span class="comment">// you walked for 700ms </span></span><br><span class="line"><span class="comment">// uncaught exception: the value is too small</span></span><br></pre></td></tr></table></figure>
+<p>让我们来分解一下上述代码都做了什么：</p>
+<ul>
+<li>创建一个异步函数需要在 function 前面添加 async 关键词</li>
+<li>这个关键词会告诉 Javascript 返回一个 Promise</li>
+<li>如果指定 async 函数返回一个非 Promise 的值，那么这个值将会被包含在 Promise 中然后被返回</li>
+<li>顾名思义， await 会告诉 Javascript 等待 promise 返回结果</li>
+</ul>
+<h5 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h5><p>通常在 promise 中，我们使用 <code>.catch()</code> 捕获最终的错误。现在有一点不同了：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">asyncFunc</span>(<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;http:your-url&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">asyncFunc</span>();</span><br><span class="line"><span class="comment">// TypeError: failed to fetch</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ES2018-新特性"><a href="#ES2018-新特性" class="headerlink" title="ES2018 新特性"></a>ES2018 新特性</h3><h4 id="对象扩展运算符"><a href="#对象扩展运算符" class="headerlink" title="对象扩展运算符"></a>对象扩展运算符</h4><p>还记得 ES6 中我们可以使用扩展运算符来做什么吗：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> veggie = [<span class="string">&quot;tomato&quot;</span>, <span class="string">&quot;cucumber&quot;</span>, <span class="string">&quot;beans&quot;</span>];</span><br><span class="line"><span class="keyword">const</span> meat = [<span class="string">&quot;pork&quot;</span>, <span class="string">&quot;beef&quot;</span>, <span class="string">&quot;chicken&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> menu = [...veggie, <span class="string">&quot;pasta&quot;</span>, ...meat];</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(menu);</span><br><span class="line"><span class="comment">// Array [ &quot;tomato&quot;, &quot;cucumber&quot;, &quot;beans&quot;, &quot;pasta&quot;, &quot;pork&quot;, &quot;beef&quot;, &quot;chicken&quot; ]</span></span><br></pre></td></tr></table></figure>
+<p>现在，扩展运算符同样适用于对象：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> myObj = &#123;</span><br><span class="line">  <span class="attr">a</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="attr">b</span>: <span class="number">3</span>,</span><br><span class="line">  <span class="attr">c</span>: <span class="number">5</span>,</span><br><span class="line">  <span class="attr">d</span>: <span class="number">8</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// we use the rest operator to grab everything else left in the object.</span></span><br><span class="line"><span class="keyword">let</span> &#123; a, b, ...z &#125; = myObj;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(a);     <span class="comment">// 1</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(b);     <span class="comment">// 3</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(z);     <span class="comment">// &#123;c: 5, d: 8&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// using the spread syntax we cloned our Object</span></span><br><span class="line"><span class="keyword">let</span> clone = &#123; ...myObj &#125;;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(clone);</span><br><span class="line"><span class="comment">// &#123;a: 1, b: 3, c: 5, d: 8&#125;</span></span><br><span class="line">myObj.<span class="property">e</span> = <span class="number">15</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(clone)</span><br><span class="line"><span class="comment">// &#123;a: 1, b: 3, c: 5, d: 8&#125;</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(myObj)</span><br><span class="line"><span class="comment">// &#123;a: 1, b: 3, c: 5, d: 8, e: 15&#125;</span></span><br></pre></td></tr></table></figure>
+<p>使用扩展运算符，我们可以轻松的复制对象（浅复制）。</p>
+<h4 id="异步的迭代"><a href="#异步的迭代" class="headerlink" title="异步的迭代"></a>异步的迭代</h4><p>使用异步的迭代，我们可以异步的遍历数据。<br><a target="_blank" rel="noopener" href="https://github.com/tc39/proposal-async-iteration">引自文档</a></p>
+<blockquote>
+<p>异步迭代器很像迭代器，只不过迭代器的 next 方法返回一对 { value, done }</p>
+</blockquote>
+<p>为此，我们将使用一个 <code>for-await-of</code> 循环，它将迭代转换成 Promise。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> iterables = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">test</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">for</span> <span class="keyword">await</span> (<span class="keyword">const</span> value <span class="keyword">of</span> iterables) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">test</span>();</span><br><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+<p>在执行过程中，<code>[Symbol.asyncIterator]()</code> 方法将会创造一个异步的迭代器，每次访问序列中的下一个值时，我们都会隐式地等待迭代器方法返回 Promise。</p>
+<h4 id="Promise-prototype-finally"><a href="#Promise-prototype-finally" class="headerlink" title="Promise.prototype.finally()"></a>Promise.prototype.finally()</h4><p>引自 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally">MDN</a>:</p>
+<blockquote>
+<p>finally() 方法返回一个 Promise。在 Promise 结束时，无论结果是 fulfilled 或者是 rejected，都会执行指定的回调函数。这为在 Promise 是否成功完成后都需要执行的代码提供了一种方式。避免了同样的语句需要在 then() 和 catch() 中各写一次的情况。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myPromise = <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">resolve</span>();</span><br><span class="line">&#125;)；</span><br><span class="line"></span><br><span class="line">myPromise</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;still working&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">catch</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;there was an error&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">finally</span>(<span class="function">()=&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done!&#x27;</span>);</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<p><code>.finally()</code> 同样会返回一个 promise，所以我们可以继续链式调用 <code>then</code> 和 <code>catch</code> 方法，但是它们是基于之前的 promise 进行调用的。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myPromise = <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">resolve</span>();</span><br><span class="line">&#125;)；</span><br><span class="line"></span><br><span class="line">myPromise</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;still working&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;still working&#x27;</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">finally</span>(<span class="function">()=&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Done!&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;Done!&#x27;</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">  &#125;)</span><br><span class="line"><span class="comment">// still working</span></span><br><span class="line"><span class="comment">// Done!</span></span><br><span class="line"><span class="comment">// still working</span></span><br></pre></td></tr></table></figure>
+<p>从上边代码可以看到 <code>finally</code> 后边的 <code>then</code> 返回的值是由第一个 <code>then</code> 创建的，而不是 <code>finally</code>。</p>
+<h4 id="正则表达式的新特性"><a href="#正则表达式的新特性" class="headerlink" title="正则表达式的新特性"></a>正则表达式的新特性</h4><p>在新版的 ECMA 中，共更新了 4 个关于正则的特性。</p>
+<ul>
+<li>正则表达式的 s (doAll) 标志</li>
+<li>正则表达式捕获组命名</li>
+<li>正则表达式反向断言 (Lookbehind Assertions)</li>
+<li>unicode 字符转义 (Unicode property escapes)</li>
+</ul>
+<h5 id="s-doAll-标志"><a href="#s-doAll-标志" class="headerlink" title="s (doAll) 标志"></a>s (doAll) 标志</h5><blockquote>
+<p>引自<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp/dotAll">MDN</a></p>
+</blockquote>
+<p><code>dotAll</code> 属性表明是否在正则表达式中一起使用 “<code>s</code>“ 修饰符（引入 &#x2F;s 修饰符，使得<code>.</code>可以匹配任意单个字符，包括换行符和回车符）</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/foo.<span class="property">bar</span>/s.<span class="title function_">test</span>(<span class="string">&#x27;foo\nbar&#x27;</span>);</span><br><span class="line"><span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="捕获组命名"><a href="#捕获组命名" class="headerlink" title="捕获组命名"></a>捕获组命名</h5><blockquote>
+<p>想要引用正则匹配到的某一部分字符串可以为捕获组编号。每个捕获组的数字都是唯一的，可以对应的数字引用它们，但是这使正则表达式难以阅读和维护。例如 <code>/(\d&#123;4&#125;)-(\d&#123;2&#125;)-(\d&#123;2&#125;)/</code> 匹配一个日期，但如果不看上下文的代码，就无法确定哪一组对应于月份，哪一组是一天。当然，如果哪一天需要交换日期和月份的顺序，那么对应的组引用也需要更新。现在，可以使用 <code>(?&lt;name&gt;...)</code> 来为捕获组命名，以表示任何标识符名称。重写上述例子：<code>/(?&lt;year&gt;\d&#123;4&#125;)-(?&lt;month&gt;\d&#123;2&#125;)-(?&lt;day&gt;\d&#123;2&#125;)/u</code> 每一个命名都是唯一且遵循 ECMA 命名规范的。命名的组可以通过匹配结果的 <code>result</code> 属性来访问。对组的数字引用也会被建立，就像未命名的组一样。看下边几个例子：</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> re = <span class="regexp">/(?&lt;year&gt;\d&#123;4&#125;)-(?&lt;month&gt;\d&#123;2&#125;)-(?&lt;day&gt;\d&#123;2&#125;)/u</span>;</span><br><span class="line"><span class="keyword">let</span> result = re.<span class="title function_">exec</span>(<span class="string">&#x27;2015-01-02&#x27;</span>);</span><br><span class="line"><span class="comment">// result.groups.year === &#x27;2015&#x27;;</span></span><br><span class="line"><span class="comment">// result.groups.month === &#x27;01&#x27;;</span></span><br><span class="line"><span class="comment">// result.groups.day === &#x27;02&#x27;;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// result[0] === &#x27;2015-01-02&#x27;;</span></span><br><span class="line"><span class="comment">// result[1] === &#x27;2015&#x27;;</span></span><br><span class="line"><span class="comment">// result[2] === &#x27;01&#x27;;</span></span><br><span class="line"><span class="comment">// result[3] === &#x27;02&#x27;;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> &#123; <span class="attr">groups</span>: &#123; one, two &#125; &#125; = <span class="regexp">/^(?&lt;one&gt;.*):(?&lt;two&gt;.*)$/u</span>.<span class="title function_">exec</span>(<span class="string">&#x27;foo:bar&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`one: <span class="subst">$&#123;one&#125;</span>, two: <span class="subst">$&#123;two&#125;</span>`</span>); </span><br><span class="line"><span class="comment">// one: foo, two: bar</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="反向断言"><a href="#反向断言" class="headerlink" title="反向断言"></a>反向断言</h5><blockquote>
+<p>使用反向断言可以确保匹配之前或者之后没有其他匹配。反向断言的语法表示为 <code>(?&lt;=...)</code> 。<br>例如：匹配一个美元数值且不包含美元符号可以这样写 <code>/(?&lt;=$)\d+(\.\d*)?/</code>，这个表达式会匹配 <code>$10.53</code> 并返回 <code>10.53</code>，而并不会匹配 <code>€10.53</code>。而 <code>(?&lt;!...)</code> 匹配的规则正相反，它会匹配不存在表达式中的匹配项，例如 <code>/(?&lt;!$)\d+(?:\.\d*)/</code> 不会匹配 <code>$10.53</code>，但是会匹配 <code>€10.53</code>。</p>
+</blockquote>
+<h5 id="Unicode-字符转义"><a href="#Unicode-字符转义" class="headerlink" title="Unicode 字符转义"></a>Unicode 字符转义</h5><blockquote>
+<p>Unicode 字符转义是一种新的转义序列，<code>u</code> 作为字符转义的标志， <code>\p&#123;...&#125;</code> 和 <code>\P&#123;...&#125;</code> 用来添加转义符。有了这个特性，匹配 Unicode 字符可以这样写：</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> regexGreekSymbol = <span class="regexp">/\p&#123;Script=Greek&#125;/u</span>;</span><br><span class="line">regexGreekSymbol.<span class="title function_">test</span>(<span class="string">&#x27;π&#x27;</span>);</span><br><span class="line"><span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="解除模板字符限制"><a href="#解除模板字符限制" class="headerlink" title="解除模板字符限制"></a>解除模板字符限制</h4><p>当使用 Tagged 模板字符串时，转义字符的限制被移除了（<a target="_blank" rel="noopener" href="https://tc39.github.io/proposal-template-literal-revision/#sec-template-literals">阅读更多</a>）</p>
+<h3 id="ES2019-新特性"><a href="#ES2019-新特性" class="headerlink" title="ES2019 新特性"></a>ES2019 新特性</h3><h4 id="Array-prototype-flat-Array-prototype-flatMap"><a href="#Array-prototype-flat-Array-prototype-flatMap" class="headerlink" title="Array.prototype.flat() &#x2F; Array.prototype.flatMap()"></a>Array.prototype.flat() &#x2F; Array.prototype.flatMap()</h4><p><code>Array.prototype.flat()</code> 会递归地展平一个数组并作为新值返回，它接受一个表示递归深度的值，未传值则默认深度为1。可以用 <code>Infinity</code> 去展平所有嵌套的数组。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> letters = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, [<span class="string">&#x27;c&#x27;</span>, <span class="string">&#x27;d&#x27;</span>, [<span class="string">&#x27;e&#x27;</span>, <span class="string">&#x27;f&#x27;</span>]]];</span><br><span class="line"><span class="comment">// default depth of 1</span></span><br><span class="line">letters.<span class="title function_">flat</span>();</span><br><span class="line"><span class="comment">// [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, [&#x27;e&#x27;, &#x27;f&#x27;]]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// depth of 2</span></span><br><span class="line">letters.<span class="title function_">flat</span>(<span class="number">2</span>);</span><br><span class="line"><span class="comment">// [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;, &#x27;f&#x27;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// which is the same as executing flat with depth of 1 twice</span></span><br><span class="line">letters.<span class="title function_">flat</span>().<span class="title function_">flat</span>();</span><br><span class="line"><span class="comment">// [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;, &#x27;f&#x27;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Flattens recursively until the array contains no nested arrays</span></span><br><span class="line">letters.<span class="title function_">flat</span>(<span class="title class_">Infinity</span>)</span><br><span class="line"><span class="comment">// [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;, &#x27;f&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Array.prototype.flatMap()</code> 与深度值为1的 flat 几乎相同，但它并非仅仅展平数组。 flatMap 接收一个处理函数，使用 <code>flatMap()</code> 可以在展平的同时更改对应的值并返回一个新的数组。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> greeting = [<span class="string">&quot;Greetings from&quot;</span>, <span class="string">&quot; &quot;</span>, <span class="string">&quot;Vietnam&quot;</span>];</span><br><span class="line">greeting.<span class="title function_">flatMap</span>(<span class="function"><span class="params">x</span> =&gt;</span> x.<span class="title function_">split</span>(<span class="string">&quot; &quot;</span>))</span><br><span class="line"><span class="comment">// [&quot;Greetings&quot;, &quot;from&quot;, &quot;&quot;, &quot;&quot;, &quot;Vietnam&quot;]</span></span><br></pre></td></tr></table></figure>
+<p>这有点类似于 <code>map()</code> 方法，只不过多了一次展平操作。</p>
+<h4 id="Object-fromEntries"><a href="#Object-fromEntries" class="headerlink" title="Object.fromEntries()"></a>Object.fromEntries()</h4><p>Object.fromEntries() 将一组键值对转换成对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> keyValueArray = [</span><br><span class="line">  [<span class="string">&#x27;key1&#x27;</span>, <span class="string">&#x27;value1&#x27;</span>],</span><br><span class="line">  [<span class="string">&#x27;key2&#x27;</span>, <span class="string">&#x27;value2&#x27;</span>]</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> obj = <span class="title class_">Object</span>.<span class="title function_">fromEntries</span>(keyValueArray)</span><br><span class="line"><span class="comment">// &#123;key1: &quot;value1&quot;, key2: &quot;value2&quot;&#125;</span></span><br></pre></td></tr></table></figure>
+<p>我们可以将任何可迭代的值作为 <code>Object.entries()</code> 方法的参数，不论它是一个 <code>Array</code> 还是 <code>Map</code>，或是其他实现了迭代协议的值。</p>
+<p>注：可迭代协议( Iteration Protocols )是 ES2015 提出的，通常通过常量 <code>Symbol.iterator</code> 访问该对象的可迭代属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> someString = <span class="string">&quot;hi&quot;</span>;</span><br><span class="line"><span class="keyword">typeof</span> someString[<span class="title class_">Symbol</span>.<span class="property">iterator</span>]; <span class="comment">// &quot;function&quot;</span></span><br><span class="line"><span class="keyword">var</span> iterator = someString[<span class="title class_">Symbol</span>.<span class="property">iterator</span>]();</span><br><span class="line"></span><br><span class="line">iterator + <span class="string">&quot;&quot;</span>;  <span class="comment">// &quot;[object String Iterator]&quot;</span></span><br><span class="line">iterator.<span class="title function_">next</span>()    <span class="comment">// &#123; value: &quot;h&quot;, done: false &#125;</span></span><br><span class="line">iterator.<span class="title function_">next</span>();   <span class="comment">// &#123; value: &quot;i&quot;, done: false &#125;</span></span><br><span class="line">iterator.<span class="title function_">next</span>();   <span class="comment">// &#123; value: undefined, done: true &#125;</span></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols">阅读更多关于迭代协议的内容</a></p>
+<h4 id="String-prototype-trimStart-trimEnd"><a href="#String-prototype-trimStart-trimEnd" class="headerlink" title="String.prototype.trimStart() &#x2F; .trimEnd()"></a>String.prototype.trimStart() &#x2F; .trimEnd()</h4><p><code>String.prototype.trimStart()</code> 移除字符串前面的空白符，<code>String.prototype.trimEnd()</code> 移除字符串后面的空白符。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> str = <span class="string">&quot;    this string has a lot of whitespace   &quot;</span>;</span><br><span class="line"></span><br><span class="line">str.<span class="property">length</span>;</span><br><span class="line"><span class="comment">// 42</span></span><br><span class="line"></span><br><span class="line">str = str.<span class="title function_">trimStart</span>();</span><br><span class="line"><span class="comment">// &quot;this string has a lot of whitespace   &quot;</span></span><br><span class="line">str.<span class="property">length</span>;</span><br><span class="line"><span class="comment">// 38</span></span><br><span class="line"></span><br><span class="line">str = str.<span class="title function_">trimEnd</span>();</span><br><span class="line"><span class="comment">// &quot;this string has a lot of whitespace&quot;</span></span><br><span class="line">str.<span class="property">length</span>;</span><br><span class="line"><span class="comment">// 35</span></span><br></pre></td></tr></table></figure>
+<p>也可以使用 <code>.trimStart()</code> 和 <code>trimEnd()</code> 的别名： <code>.trimLeft()</code> 和 <code>.trimRight()</code> 。</p>
+<h4 id="可选的-catch-捕获参数"><a href="#可选的-catch-捕获参数" class="headerlink" title="可选的 catch 捕获参数"></a>可选的 catch 捕获参数</h4><p>在 ES2019 之前，你必须为 catch 捕获传递一个表示异常的变量，现在这个变量不是必要的了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Before</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125; <span class="keyword">catch</span>(error) &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ES2019</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这在你想忽略错误参数的时候很有用。</p>
+<h4 id="Function-ptototype-toString"><a href="#Function-ptototype-toString" class="headerlink" title="Function.ptototype.toString()"></a>Function.ptototype.toString()</h4><p><code>.toString()</code> 方法返回一个代表函数源码的字符串。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">sum</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(sum.<span class="title function_">toString</span>());</span><br><span class="line"><span class="comment">// function sum(a, b) &#123;</span></span><br><span class="line"><span class="comment">//    return a + b;</span></span><br><span class="line"><span class="comment">//  &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>注释也会被包含其中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">sum</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="comment">// perform a sum</span></span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(sum.<span class="title function_">toString</span>());</span><br><span class="line"><span class="comment">// function sum(a, b) &#123;</span></span><br><span class="line"><span class="comment">//   // perform a sum</span></span><br><span class="line"><span class="comment">//   return a + b;</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Symbol-prototype-description"><a href="#Symbol-prototype-description" class="headerlink" title="Symbol.prototype.description"></a>Symbol.prototype.description</h4><p><code>.description</code> 返回 <code>Symbol</code> 对象可选描述的字符串。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> me = <span class="title class_">Symbol</span>(<span class="string">&quot;Alberto&quot;</span>);</span><br><span class="line">me.<span class="property">description</span>;</span><br><span class="line"><span class="comment">// &quot;Alberto&quot;</span></span><br><span class="line"></span><br><span class="line">me.<span class="title function_">toString</span>()</span><br><span class="line"><span class="comment">//  &quot;Symbol(Alberto)&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ES2020-特性"><a href="#ES2020-特性" class="headerlink" title="ES2020 特性"></a>ES2020 特性</h3><h4 id="BigInt-类型"><a href="#BigInt-类型" class="headerlink" title="BigInt 类型"></a>BigInt 类型</h4><p>BigInt 是 JavaScript 第七个原始类型，它允许开发者操作非常大的整型。<br>数字类型可以处理 <code>2 ** 53 - 1</code> 即 <code>9007199254740991</code> 以内的数。可以通过常量 <code>MAX_SAFE_INTEGER</code> 来访问这个值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Number</span>.<span class="property">MAX_SAFE_INTEGER</span>; <span class="comment">// 9007199254740991</span></span><br></pre></td></tr></table></figure>
+<p>顾名思义，若操作的 number 值超过最大值时,运行结果就会变的奇怪。使用 <code>BigInt</code> 类型则没有明确的界限，因为它的界限取决于运行设备的内存。<br>定义 <code>BigInt</code> 类型，你即可以通过给 <code>BigInt()</code> 构造函数传递一个字符串值来创建，也可以像平常一样使用字面量语法来创建，但是要在尾部加上一个字符 <code>n</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myBigInt = <span class="title class_">BigInt</span>(<span class="string">&quot;999999999999999999999999999999&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> mySecondBigInt = <span class="number">999999999999999999999999999999n</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typeof</span> myBigInt; <span class="comment">// &quot;bigint&quot;</span></span><br></pre></td></tr></table></figure>
+<p>注意，<code>BigInt</code> 类型与常规类型的数字并不是完全兼容的，这意味这你确定最好仅在操作比较大的数据时使用它。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bigInt = <span class="number">1n</span>; <span class="comment">// small number, but still of BigInt type</span></span><br><span class="line"><span class="keyword">const</span> num = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">num === bigInt; <span class="comment">// false -&gt; they aren&#x27;t strictly equal</span></span><br><span class="line">num == bigInt; <span class="comment">// true</span></span><br><span class="line">num &gt;= bigInt; <span class="comment">// true -&gt; they can be compared</span></span><br><span class="line">num + bigInt; <span class="comment">// error -&gt; they can&#x27;t operate with one another</span></span><br></pre></td></tr></table></figure>
+<p>总之，使用 JS 做比较复杂的数学运算时 <code>BigInt</code> 是个不错的选择。它在替换专门用于处理大量数字的库方面表现良好。现在至少在整型方向有所进展，而目前我们对 <code>BigDecimal</code> 的提案了解的还很少。</p>
+<h4 id="动态导入（Dynamic-imports）"><a href="#动态导入（Dynamic-imports）" class="headerlink" title="动态导入（Dynamic imports）"></a>动态导入（Dynamic imports）</h4><p>动态导入，允许在浏览器端动态地加载代码模块。使用 <code>import()</code> 语法来导入你的代码块。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span>(<span class="string">&quot;module.js&quot;</span>).<span class="title function_">then</span>(<span class="function">(<span class="params"><span class="variable language_">module</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"><span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="variable language_">module</span> = <span class="keyword">await</span> <span class="keyword">import</span>(<span class="string">&quot;module.js&quot;</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>import()</code> 返回一个 promise，resolve 中会返回代码模块加载后的内容。可以使用 ES6 的 <code>.then()</code> 方法或者 <code>async/await</code> 来处理加载结果。</p>
+<h4 id="空值合并操作符（-）"><a href="#空值合并操作符（-）" class="headerlink" title="空值合并操作符（??）"></a>空值合并操作符（??）</h4><p>空值合并操作符（??）是一个新的 JS 运算符，当所访问的值是 null 或者 undefined 时，它会提供一个默认值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> basicValue = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> nullishValue = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> firstExample = basicValue ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;test&quot;</span></span><br><span class="line"><span class="keyword">const</span> secondExample = nullishValue ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br></pre></td></tr></table></figure>
+<p>但是这跟 逻辑或（||）有什么区别呢？当第一个数是虚值 (在 Boolean 上下文中认定为 false 的值)，如 <code>false</code>, <code>0</code>, 或者<code>&quot;&quot;</code>，以及空值 <code>null</code> 和 <code>undefined</code>，那么 逻辑或 将会使用第二个操作数。而空值合并操作符仅仅是在第一个值为空值而不是虚值的时候才会使用第二个操作数。如果你的代码可以接受除了 <code>null</code> 和 <code>undefined</code> 以外的任何值，那么空值合并操作符就是最佳选择。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> falseValue = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">const</span> zeroValue = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">const</span> emptyValue = <span class="string">&quot;&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> nullishValue = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> firstExampleOR = falseValue || <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br><span class="line"><span class="keyword">const</span> secondExampleOR = zeroValue || <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br><span class="line"><span class="keyword">const</span> thirdExampleOR = emptyValue || <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br><span class="line"><span class="keyword">const</span> forthExampleOR = nullish || <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> firstExample = falseValue ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// false</span></span><br><span class="line"><span class="keyword">const</span> secondExample = zeroValue ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// 0</span></span><br><span class="line"><span class="keyword">const</span> thirdExample = emptyValue ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;&quot;</span></span><br><span class="line"><span class="keyword">const</span> forthExample = nullish ?? <span class="string">&quot;example&quot;</span>; <span class="comment">// &quot;example&quot;</span></span><br></pre></td></tr></table></figure>
+<h4 id="可选链（-）"><a href="#可选链（-）" class="headerlink" title="可选链（?.）"></a>可选链（?.）</h4><p>与空值合并操作符类似，只不过可选链是处理 Object 中 <code>null</code> 和 <code>undefined</code> 的。鉴于直接从空值中国获取属性值会报错，现在可选链会直接将空值返回。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = &#123;</span><br><span class="line">  <span class="attr">prop</span>: &#123;</span><br><span class="line">    <span class="attr">subProp</span>: &#123;</span><br><span class="line">      <span class="attr">value</span>: <span class="number">1</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">obj.<span class="property">prop</span>.<span class="property">subProp</span>.<span class="property">value</span>; <span class="comment">// 1</span></span><br><span class="line">obj.<span class="property">prop</span>.<span class="property">secondSubProp</span>.<span class="property">value</span>; <span class="comment">// error</span></span><br><span class="line"></span><br><span class="line">obj?.<span class="property">prop</span>?.<span class="property">subProp</span>?.<span class="property">value</span>; <span class="comment">// 1</span></span><br><span class="line">obj?.<span class="property">prop</span>?.<span class="property">secondSubProp</span>?.<span class="property">value</span>; <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+<p>当然，这只是一个语法糖，但也是一个很受欢迎的补充。记住不要在代码里到处使用这些操作符，他们虽然用起来方便，但从性能角度来说，它比普通的 <code>.</code> 开销要大。而且，若是代码是经过 Babel 和 TypeScript 转义的，则更要谨慎使用。</p>
+<h4 id="GlobalThis"><a href="#GlobalThis" class="headerlink" title="GlobalThis"></a>GlobalThis</h4><p>由于 JavaScript 的代码可以运行在多个不同的环境，例如 浏览器、Node.js、Web Worker 等，要实现这种交叉兼容性绝非易事，globalThis 的出现方便了这些操作。<br><code>globalThis</code> 是一个新的全局属性，通常它引用的是当前环境下的全局对象。就像是 <code>self</code> 对于 Web Workers，<code>window</code> 对于浏览器，<code>global</code> 对于 Node.js，以及其他实现了ES2020标准的运行环境。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hacky globalThis polyfill you had to use pre-ES2020</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">getGlobal</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> self !== <span class="string">&quot;undefined&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> self;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="variable language_">window</span> !== <span class="string">&quot;undefined&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">window</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="variable language_">global</span> !== <span class="string">&quot;undefined&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable language_">global</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;Couldn&#x27;t detect global&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">getGlobal</span>() === globalThis; <span class="comment">// true (for browser, Web Worker and Node.js)</span></span><br><span class="line">globalThis === <span class="variable language_">window</span>; <span class="comment">// true (if you&#x27;re in browser)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Promise-allSettled"><a href="#Promise-allSettled" class="headerlink" title="Promise.allSettled()"></a>Promise.allSettled()</h4><p>这个新增的方法看起来有点像 <code>Promise.all()</code>。<br><code>Promise.all()</code> 的参数中的 promise 若有一个失败，则此实例回调失败。而 <code>Promise.allSettled()</code>不论成功或者失败，都会返回处理结束后的对象数组。</p>
+<h4 id="String-matchAll"><a href="#String-matchAll" class="headerlink" title="String.matchAll()"></a>String.matchAll()</h4><p>如果你之前使用正则，那么相比于在 <code>while</code> 循环中使用 <code>RegExp.exec()</code> 并开启标志 <code>g</code> 来匹配，<code>String.matchAll()</code> 会是更好的选择。它会返回一个包含了所有匹配结果的数组，包括捕获组的匹配结果。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> regexp = <span class="regexp">/t(e)(st(\d?))/g</span>;</span><br><span class="line"><span class="keyword">const</span> str = <span class="string">&quot;test1test2&quot;</span>;</span><br><span class="line"><span class="keyword">const</span> resultsArr = [...str.<span class="title function_">matchAll</span>(regexp)]; <span class="comment">// convert iterator to an array</span></span><br><span class="line"></span><br><span class="line">resultsArr[<span class="number">0</span>]; <span class="comment">// [&quot;test1&quot;, &quot;e&quot;, &quot;st1&quot;, &quot;1&quot;]</span></span><br><span class="line">resultsArr[<span class="number">1</span>]; <span class="comment">// [&quot;test2&quot;, &quot;e&quot;, &quot;st2&quot;, &quot;2&quot;]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a>原文链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://inspiredwebdev.com/everything-from-es-2016-to-es-2019">everything-from-es-2016-to-es-2019</a></li>
+<li><a target="_blank" rel="noopener" href="https://areknawo.com/ecmascript-2020-biggest-new-features/">ecmascript-2020-biggest-new-features</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/02/PWA-Service-Worker-%E5%B0%8F%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89%E5%AE%9E%E8%B7%B5/" rel="prev" title="PWA-Service Worker 小结（二）实践">
+      <i class="fa fa-chevron-left"></i> PWA-Service Worker 小结（二）实践
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/10/%E3%80%90%E8%AF%91%E3%80%91Can-NodeJS-use-ES6-import-syntax/" rel="next" title="【译】Can NodeJS use ES6 import syntax ?">
+      【译】Can NodeJS use ES6 import syntax ? <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80%EF%BC%9A%E5%85%B3%E4%BA%8EECMA"><span class="nav-text">前言：关于ECMA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES2016-%E6%96%B0%E7%89%B9%E6%80%A7"><span class="nav-text">ES2016 新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Array-prototype-includes"><span class="nav-text">Array.prototype.includes()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E6%95%B0%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">指数操作符 (**)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES2017-%E6%96%B0%E7%89%B9%E6%80%A7"><span class="nav-text">ES2017 新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A1%AB%E5%85%85-String-padStart-%E5%92%8C-String-padEnd"><span class="nav-text">字符串填充 ( String.padStart() 和 String.padEnd() )</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Object-entries-%E5%92%8C-Object-values"><span class="nav-text">Object.entries() 和 Object.values()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Object-getOwnPropertyDescriptors"><span class="nav-text">Object.getOwnPropertyDescriptors()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%BE%E8%A1%8C%E9%80%97%E5%8F%B7"><span class="nav-text">尾行逗号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E5%92%8C%E5%8E%9F%E5%AD%90%E6%80%A7%E6%93%8D%E4%BD%9C"><span class="nav-text">共享内存和原子性操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Atomics-add-Atomics-sub-Atomics-load-and-Atomics-store"><span class="nav-text">Atomics.add(), Atomics.sub(), Atomics.load(), and Atomics.store()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Atomics-and-Atomics-or-Atomics-xor"><span class="nav-text">Atomics.and(), Atomics.or(), Atomics.xor()</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Async-%E5%92%8C-Await"><span class="nav-text">Async 和 Await</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9B%9E%E9%A1%BE%E4%B8%80%E4%B8%8B-Promise"><span class="nav-text">回顾一下 Promise</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Async-%E5%92%8C-Await-1"><span class="nav-text">Async 和 Await</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="nav-text">错误处理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES2018-%E6%96%B0%E7%89%B9%E6%80%A7"><span class="nav-text">ES2018 新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%89%A9%E5%B1%95%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-text">对象扩展运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5%E7%9A%84%E8%BF%AD%E4%BB%A3"><span class="nav-text">异步的迭代</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Promise-prototype-finally"><span class="nav-text">Promise.prototype.finally()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%9A%84%E6%96%B0%E7%89%B9%E6%80%A7"><span class="nav-text">正则表达式的新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#s-doAll-%E6%A0%87%E5%BF%97"><span class="nav-text">s (doAll) 标志</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8D%95%E8%8E%B7%E7%BB%84%E5%91%BD%E5%90%8D"><span class="nav-text">捕获组命名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E6%96%AD%E8%A8%80"><span class="nav-text">反向断言</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Unicode-%E5%AD%97%E7%AC%A6%E8%BD%AC%E4%B9%89"><span class="nav-text">Unicode 字符转义</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E9%99%A4%E6%A8%A1%E6%9D%BF%E5%AD%97%E7%AC%A6%E9%99%90%E5%88%B6"><span class="nav-text">解除模板字符限制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES2019-%E6%96%B0%E7%89%B9%E6%80%A7"><span class="nav-text">ES2019 新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Array-prototype-flat-Array-prototype-flatMap"><span class="nav-text">Array.prototype.flat() &#x2F; Array.prototype.flatMap()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Object-fromEntries"><span class="nav-text">Object.fromEntries()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#String-prototype-trimStart-trimEnd"><span class="nav-text">String.prototype.trimStart() &#x2F; .trimEnd()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%80%89%E7%9A%84-catch-%E6%8D%95%E8%8E%B7%E5%8F%82%E6%95%B0"><span class="nav-text">可选的 catch 捕获参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Function-ptototype-toString"><span class="nav-text">Function.ptototype.toString()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Symbol-prototype-description"><span class="nav-text">Symbol.prototype.description</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES2020-%E7%89%B9%E6%80%A7"><span class="nav-text">ES2020 特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BigInt-%E7%B1%BB%E5%9E%8B"><span class="nav-text">BigInt 类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%AF%BC%E5%85%A5%EF%BC%88Dynamic-imports%EF%BC%89"><span class="nav-text">动态导入（Dynamic imports）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BA%E5%80%BC%E5%90%88%E5%B9%B6%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88-%EF%BC%89"><span class="nav-text">空值合并操作符（??）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%80%89%E9%93%BE%EF%BC%88-%EF%BC%89"><span class="nav-text">可选链（?.）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GlobalThis"><span class="nav-text">GlobalThis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Promise-allSettled"><span class="nav-text">Promise.allSettled()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#String-matchAll"><span class="nav-text">String.matchAll()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E6%96%87%E9%93%BE%E6%8E%A5"><span class="nav-text">原文链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="每次都是从老项目中 Ctrl+C &amp; Ctrl+V 拷贝一份文件目录和编译脚本，然后删删改改就可以跑新项目了。大多项目的编译模块其实都大同小异。于是在 2022 年中的时候写了一个 cli，主要功能是【快速生成项目模板】。今年按需维护和更新，从 v1 升级至 v2 ，出于灵活性考虑，将编译配置一并生成到项目中。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dweb-cli 开发小结">
+<meta property="og:url" content="http://yoursite.com/2023/12/20/dweb-cli%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="每次都是从老项目中 Ctrl+C &amp; Ctrl+V 拷贝一份文件目录和编译脚本，然后删删改改就可以跑新项目了。大多项目的编译模块其实都大同小异。于是在 2022 年中的时候写了一个 cli，主要功能是【快速生成项目模板】。今年按需维护和更新，从 v1 升级至 v2 ，出于灵活性考虑，将编译配置一并生成到项目中。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-20T08:21:07.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.682Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="NodeJS">
+<meta property="article:tag" content="开发小结">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2023/12/20/dweb-cli%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>dweb-cli 开发小结 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2023/12/20/dweb-cli%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          dweb-cli 开发小结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-12-20 16:21:07 16:21:07" itemprop="dateCreated datePublished" datetime="2023-12-20T16:21:07+08:00">2023-12-20 16:21:07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>每次都是从老项目中 <code>Ctrl+C</code> &amp; <code>Ctrl+V</code> 拷贝一份文件目录和编译脚本，然后删删改改就可以跑新项目了。大多项目的编译模块其实都大同小异。于是在 2022 年中的时候写了一个 cli，主要功能是【快速生成项目模板】。<br>今年按需维护和更新，从 v1 升级至 v2 ，出于灵活性考虑，将编译配置一并生成到项目中。</p>
+<span id="more"></span>
+
+<h3 id="一、前期准备"><a href="#一、前期准备" class="headerlink" title="一、前期准备"></a>一、前期准备</h3><ul>
+<li>确定主要功能</li>
+<li>确定通用依赖版本</li>
+<li>确定命令行基础交互功能</li>
+<li>确定 cli 项目结构</li>
+<li>确定内置模板项目结构</li>
+</ul>
+<h3 id="二、项目搭建"><a href="#二、项目搭建" class="headerlink" title="二、项目搭建"></a>二、项目搭建</h3><h4 id="项目名称"><a href="#项目名称" class="headerlink" title="项目名称"></a>项目名称</h4><p>脚手架名字定为 dweb-cli ，表示这是一个用于 douban web 项目开发的工具。</p>
+<!-- - 集成编译脚本：让用户可以通过 dweb-cli 直接编译脚手架生成的项目、而无需再手动配置。 -->
+<h4 id="通用依赖"><a href="#通用依赖" class="headerlink" title="通用依赖"></a>通用依赖</h4><p><code>webpack 5</code>、<code>react 17.0.2</code>、<code>react-dom 17.0.2</code>、<code>react-router 6.10.0</code>、<code>typescript 5.0.4</code></p>
+<h4 id="命令行交互"><a href="#命令行交互" class="headerlink" title="命令行交互"></a>命令行交互</h4><p>实现命令行交互需要 <code>package.json</code> 为 <code>bin</code> 选项设置命令行脚本入口 </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;bin&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;dweb&quot;</span>: <span class="string">&quot;bin/cli.js&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="三、基础功能"><a href="#三、基础功能" class="headerlink" title="三、基础功能"></a>三、基础功能</h3><h4 id="1-项目创建"><a href="#1-项目创建" class="headerlink" title="1. 项目创建"></a>1. 项目创建</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dweb create &lt;projectName&gt;</span><br></pre></td></tr></table></figure>
+<p>可选项:</p>
+<ul>
+<li>是否需要 react router</li>
+<li>是否需要 reset.css</li>
+<li>UI 适配模式：none | flex2rem | viewport</li>
+<li>是否在创建完成后自动执行 <code>npm install</code></li>
+</ul>
+<h4 id="2-项目编译"><a href="#2-项目编译" class="headerlink" title="2. 项目编译"></a>2. 项目编译</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dweb run serve <span class="comment"># 本地启用 webpack-dev-server 开发</span></span><br><span class="line">dweb run dev <span class="comment"># 开发模式</span></span><br><span class="line">dweb run build <span class="comment"># 生产模式</span></span><br></pre></td></tr></table></figure>
+<p>可选参数：</p>
+<ul>
+<li><code>-c， --config</code> 指定 webpack 配置路径</li>
+<li><code>-d, --deploy-config</code> 指定编译完成后的回调函数（文件）路径</li>
+<li><code>-e, --entry</code> 指定要编译的入口名，默认编译全部入口</li>
+<li><code>--dev-server-options</code> 指定 webpack-dev-server 配置路径</li>
+<li><code>--free-config</code> 完全使用的 <code>--config</code> 中指定的配置，不使用 cli 自带的默认配置</li>
+</ul>
+<h4 id="3-其他命令"><a href="#3-其他命令" class="headerlink" title="3. 其他命令"></a>3. 其他命令</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dweb clean <span class="comment"># 清理 /dist 文件夹</span></span><br><span class="line">dweb <span class="built_in">export</span> &lt;configType&gt; <span class="comment"># 导出 cli 中的某项配置到当前目录</span></span><br></pre></td></tr></table></figure>
+<h3 id="四、脚手架目录结构"><a href="#四、脚手架目录结构" class="headerlink" title="四、脚手架目录结构"></a>四、脚手架目录结构</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># dweb-cli/</span></span><br><span class="line"> ├── bin <span class="comment"># 命令执行文件</span></span><br><span class="line"> ├── build/utils <span class="comment"># 构建工具</span></span><br><span class="line"> ├── lib <span class="comment"># 命令相关的实现</span></span><br><span class="line"> ├── template <span class="comment"># 项目模板</span></span><br><span class="line"> ├── .github/workflows <span class="comment"># github ci 配置文件</span></span><br><span class="line"> ├── .husky <span class="comment"># 代码提交相关的钩子配置（eslint）</span></span><br></pre></td></tr></table></figure>
+<h4 id="模板目录结构"><a href="#模板目录结构" class="headerlink" title="模板目录结构"></a>模板目录结构</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># dweb-cli/template/</span></span><br><span class="line">├── src</span><br><span class="line">│   ├── common</span><br><span class="line">│   │   ├── assets</span><br><span class="line">│   │   ├── components</span><br><span class="line">│   │   │   └── App</span><br><span class="line">│   │   │       ├── index.tsx</span><br><span class="line">│   │   │       └── style.scss</span><br><span class="line">│   │   ├── const</span><br><span class="line">│   │   │   └── index.ts</span><br><span class="line">│   │   ├── types</span><br><span class="line">│   │   │   └── index.d.ts</span><br><span class="line">│   │   └── utils</span><br><span class="line">│   │       └── axios-instance.ts</span><br><span class="line">│   └── pages</span><br><span class="line">│       ├── home</span><br><span class="line">│       │   ├── index.tsx</span><br><span class="line">│       │   └── style.scss</span><br><span class="line">│       └── screenshot</span><br><span class="line">│           ├── index.tsx</span><br><span class="line">│           └── style.scss</span><br><span class="line">├── tsconfig.json</span><br><span class="line">├── webpack.config.js</span><br><span class="line">├── package.json</span><br><span class="line">├── README.md</span><br><span class="line">└── yarn.lock</span><br></pre></td></tr></table></figure>
+<h3 id="五、后续更改"><a href="#五、后续更改" class="headerlink" title="五、后续更改"></a>五、后续更改</h3><p><strong>v1 将编译脚本集成在 cli 内部，编译工作交给 cli。</strong><br><strong>v2 将编译脚本生成到项目中，编译工作交还给项目，本身只保留生成功能。</strong></p>
+<p>这个更改是因为团队成员在使用 v1 版本时更希望能灵活配置编译脚本。起初 dweb v1 尝试使用自定义配置文件的路径用来支持灵活配置，但大家对于 dweb 内已集成的 loader 和编译配置实际上并不知晓（很少会点进项目&#x2F;文档查看），更希望能”<strong>直接</strong>“看到当前项目的“编译配置”。<br>所以 v2 版本的 dweb 不再集成编译工作，而是将基础的编译配置放到项目模板中，创建新项目时会自动在新项目中生成一套默认的编译脚本。</p>
+<p>不过这样做的弊端就是原本升级依赖只需要升级 dweb 的版本，而现在依然需要逐个项目进行升级。</p>
+<h4 id="更多优化"><a href="#更多优化" class="headerlink" title="更多优化"></a>更多优化</h4><ul>
+<li>使用 <code>swc-loader</code> 替换 <code>babel-loader</code> 以减少编译耗时</li>
+<li>支持第三方插件对 css module 单独编译</li>
+<li>增加 Log 埋点、登录状态凭证等基础项目配置</li>
+<li>增加 CI 配置支持 merge 自动发包、发送提醒</li>
+</ul>
+<h3 id="六、相关工具"><a href="#六、相关工具" class="headerlink" title="六、相关工具"></a>六、相关工具</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/tj/commander.js">commander</a>：命令行参数接收工具</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/chalk/chalk">chalk</a>：命令行美化工具，用于调整输出信息各字体颜色</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/SBoudrias/Inquirer.js">inquirer</a>：命令行交互工具，用于获取用户交互结果 并用 promise 返回值</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/sindresorhus/ora">ora</a>：命令行进度条美化工具</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/handlebars-lang/handlebars.js">handlebars</a>：模板渲染工具</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/NodeJS/" rel="tag"># NodeJS</a>
+              <a href="/tags/%E5%BC%80%E5%8F%91%E5%B0%8F%E7%BB%93/" rel="tag"># 开发小结</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/19/2023%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="prev" title="2023年终总结">
+      <i class="fa fa-chevron-left"></i> 2023年终总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/" rel="next" title="PAG 移动端动效方案">
+      PAG 移动端动效方案 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E6%9C%9F%E5%87%86%E5%A4%87"><span class="nav-text">一、前期准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA"><span class="nav-text">二、项目搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E5%90%8D%E7%A7%B0"><span class="nav-text">项目名称</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E4%BE%9D%E8%B5%96"><span class="nav-text">通用依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%BA%A4%E4%BA%92"><span class="nav-text">命令行交互</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD"><span class="nav-text">三、基础功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA"><span class="nav-text">1. 项目创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%A1%B9%E7%9B%AE%E7%BC%96%E8%AF%91"><span class="nav-text">2. 项目编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%85%B6%E4%BB%96%E5%91%BD%E4%BB%A4"><span class="nav-text">3. 其他命令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%84%9A%E6%89%8B%E6%9E%B6%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-text">四、脚手架目录结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-text">模板目录结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%90%8E%E7%BB%AD%E6%9B%B4%E6%94%B9"><span class="nav-text">五、后续更改</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E4%BC%98%E5%8C%96"><span class="nav-text">更多优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7"><span class="nav-text">六、相关工具</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

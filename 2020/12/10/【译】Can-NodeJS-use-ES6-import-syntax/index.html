@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇文章，这里不再赘述。 （ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】Can NodeJS use ES6 import syntax ?">
+<meta property="og:url" content="http://yoursite.com/2020/12/10/%E3%80%90%E8%AF%91%E3%80%91Can-NodeJS-use-ES6-import-syntax/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇文章，这里不再赘述。 （ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-10T12:36:12.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.693Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="NodeJS">
+<meta property="article:tag" content="翻译">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/12/10/%E3%80%90%E8%AF%91%E3%80%91Can-NodeJS-use-ES6-import-syntax/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【译】Can NodeJS use ES6 import syntax ? | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/10/%E3%80%90%E8%AF%91%E3%80%91Can-NodeJS-use-ES6-import-syntax/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【译】Can NodeJS use ES6 import syntax ?
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-10 20:36:12 20:36:12" itemprop="dateCreated datePublished" datetime="2020-12-10T20:36:12+08:00">2020-12-10 20:36:12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>偶然在一篇文章中看到 Node 可以使用 import 语法了，无需再使用 babel 做额外的转换，遂去了解下 Node 相关的更新。本文主要介绍在最新版本 Node(14.15.1) 中如何使用 import 语法。大部分内容翻译自官网和外网文章。关于 JS 模块机制之前已经总结过一篇<a href="/2019/01/03/%E5%89%8D%E7%AB%AF%E6%A8%A1%E5%9D%97%E5%8C%96/#more">文章</a>，这里不再赘述。</p>
+<p>（ PS：原本是公司部门要求的 kpi 文章，现做了精简 ）</p>
+<span id="more"></span>
+
+<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>本文主要内容：</p>
+<ul>
+<li>Node 对 ES Modules 的支持</li>
+<li>在 Node 使用 import 语法</li>
+<li>Node 中 ES Modules 的现状和未来</li>
+</ul>
+<h2 id="Node-对-ES-Modules-支持"><a href="#Node-对-ES-Modules-支持" class="headerlink" title="Node 对 ES Modules 支持"></a>Node 对 ES Modules 支持</h2><p>Node 13.2.0 开始正式支持 ES Modules 特性（移除了 –experimental-modules 启动参数）.</p>
+<p>注意：相关的 ESM 的实验性标志都虽然被移除<br>（但是由于 ESM loader 还是实验性的，所以运行 ES Modules 代码依然会有警告：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(node:47324) ExperimentalWarning: The ESM module loader is experimental.</span><br></pre></td></tr></table></figure>
+
+<h2 id="在-NodeJS-中使用-ES-Modules"><a href="#在-NodeJS-中使用-ES-Modules" class="headerlink" title="在 NodeJS 中使用 ES Modules"></a>在 NodeJS 中使用 ES Modules</h2><p>使 Node 支持 ES modules 有两种方式：</p>
+<ol>
+<li>在 package.json中，增加 <code>type: &quot;module&quot;</code>配置，即可在 node 代码中使用 <code>import</code>和<code>export</code>语法:</li>
+</ol>
+<p>文件目录结构：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── index.js</span><br><span class="line">├── package.json</span><br><span class="line">└── utils</span><br><span class="line">    └── speak.js</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// utils/speak.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">speak</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from speak.&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; speak &#125; <span class="keyword">from</span> <span class="string">&#x27;./utils/speak.js&#x27;</span>;</span><br><span class="line"><span class="title function_">speak</span>(); <span class="comment">//come from speak</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 .mjs 文件中直接使用 <code>import</code>和<code>export</code>；</li>
+</ol>
+<p>文件目录结构：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── index.mjs</span><br><span class="line">├── package.json</span><br><span class="line">└── utils</span><br><span class="line">    └── sing.mjs</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// utils/sing.mjs</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">sing</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from sing&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// index.mjs</span></span><br><span class="line"><span class="keyword">import</span> &#123; sing &#125; <span class="keyword">from</span> <span class="string">&#x27;./utils/sing.mjs&#x27;</span>;</span><br><span class="line"><span class="title function_">sing</span>(); <span class="comment">//come from sing</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>若不添加上述两项中任一项，直接使用在 Node 中使用 ES modules，则会抛出警告：  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Warning: To load an ES module, <span class="built_in">set</span> <span class="string">&quot;type&quot;</span>: <span class="string">&quot;module&quot;</span> <span class="keyword">in</span> the package.json or use the .mjs extension.</span><br></pre></td></tr></table></figure></li>
+<li><strong>根据ESM规范，使用import关键字并不会像 CommonJS 模块那样，在默认情况下以文件扩展名完成文件路径。因此，ES Modules 必须明确文件扩展名。</strong></li>
+</ul>
+<h3 id="模块作用域"><a href="#模块作用域" class="headerlink" title="模块作用域"></a>模块作用域</h3><p>一个模块的作用域，由父级中有 <code>type: &quot;module&quot;</code> 的 package.json 文件路径定义。而使用<code>.mjs</code>扩展文件加载模块，则不受限于包的作用域。<br>同理，<code>package.json</code>中没有<code>type</code>标志的包都会默认采用 CommonJS 模块机制，<code>.cjs</code>类型的扩展文件使用 CommonJS 方式加载模块同样不受限于包的作用域。</p>
+<h3 id="包的入口"><a href="#包的入口" class="headerlink" title="包的入口"></a>包的入口</h3><p>定义包的入口有两种方式，在 package.json 中定义<code>main</code>字段或者<code>exports</code>字段</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;main&quot;</span>: <span class="string">&quot;./main.js&quot;</span>,</span><br><span class="line">  <span class="string">&quot;exports&quot;</span>: <span class="string">&quot;./main.js&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，当<code>exports</code>字段被定义后，包的所有子路径都将被封装，子路径的文件不可再被导入。例如 require(‘pkg&#x2F;subpath.js’) 将会报错：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERR_PACKAGE_PATH_NOT_EXPORTED error.</span><br></pre></td></tr></table></figure>
+<p>参考官方文档：<a target="_blank" rel="noopener" href="https://nodejs.org/api/packages.html#packages_main_entry_point_export">https://nodejs.org/api/packages.html#packages_main_entry_point_export</a></p>
+<h3 id="两个模块机制在执行时机上的区别"><a href="#两个模块机制在执行时机上的区别" class="headerlink" title="两个模块机制在执行时机上的区别"></a>两个模块机制在执行时机上的区别</h3><ul>
+<li>ES Modules 导入的模块会被预解析，以便在代码运行前导入：<ul>
+<li>根据 EMS 规范 import &#x2F; export 必须位于模块顶级，不能位于作用域内；</li>
+<li>模块内的 import&#x2F;export 会提升到模块顶部；</li>
+</ul>
+</li>
+<li>在 CommonJS 中，模块将在运行时解析；</li>
+</ul>
+<p>举一个简单的例子来直观的对比下二者的差别：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ES Modules</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// a.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from a.js.&#x27;</span>);</span><br><span class="line"><span class="keyword">import</span> &#123; hello &#125; <span class="keyword">from</span> <span class="string">&#x27;./b.js&#x27;</span>;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(hello);</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from b.js.&#x27;</span>);</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> hello = <span class="string">&#x27;Hello from b.js&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Come from b.js.</span><br><span class="line">Come from a.js.</span><br><span class="line">Hello from b.js</span><br></pre></td></tr></table></figure>
+
+<p>同样的代码使用 CommonJS 机制：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CommonJS</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// a.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from a.js.&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> hello = <span class="built_in">require</span>(<span class="string">&#x27;./b.js&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(hello);</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Come from b.js.&#x27;</span>);</span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="string">&#x27;Hello from b.js&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Come from a.js.</span><br><span class="line">Come from b.js.</span><br><span class="line">Hello from b.js</span><br></pre></td></tr></table></figure>
+<p>可以看到 ES Modules 预先解析了模块代码，而 CommonJS 是代码运行的时候解析的。</p>
+<h3 id="两个模块在原理上的区别"><a href="#两个模块在原理上的区别" class="headerlink" title="两个模块在原理上的区别"></a>两个模块在原理上的区别</h3><ol>
+<li>CommonJS</li>
+</ol>
+<p>Node 将每个文件都视为独立的模块，它定义了一个 Module 构造函数，它代表模块自身：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Module</span>(<span class="params">id = <span class="string">&#x27;&#x27;</span>, parent</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">id</span> = id;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">path</span> = path.<span class="title function_">dirname</span>(id);</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">exports</span> = &#123;&#125;;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">parent</span> = parent;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">filename</span> = <span class="literal">null</span>;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">loaded</span> = <span class="literal">false</span>;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">children</span> = [];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>而 require 函数接收一个代表模块ID或者路径的值作为参数，它返回的是用<code>module.exports</code>导出的对象。在执行代码模块之前，NodeJs 将使一  个包装器对模块中的代码其进行封装：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">function</span>(<span class="params"><span class="built_in">exports</span>, <span class="built_in">require</span>, <span class="variable language_">module</span>, __filename, __dirname</span>) &#123; </span><br><span class="line">    <span class="comment">// Module code actually lives in here </span></span><br><span class="line">&#125;); </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>引自 NodeJS 官网</p>
+<p>通过这样做，Node.js 实现了以下几点：</p>
+<ul>
+<li>它保持了顶层的变量（用 var、 const 或 let 定义）作用在模块范围内，而不是全局对象。</li>
+<li>它有助于提供一些看似全局的但实际上是模块特定的变量，例如：<ul>
+<li>实现者可以用于从模块中导出值的 module 和 exports 对象。</li>
+<li>包含模块绝对文件名和目录路径的快捷变量 __filename 和 __dirname 。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>简言之，每个模块都有自己的函数包装器， Node 通过此种方式确保模块内的代码对它是私有的。在包装器执行之前，模块内的导出内容是不确定的。<br>除此之外，第一次加载的模块会被缓存到 <code>Module._cache</code>中。一个完整的加载周期大致如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resolution (解析) –&gt; Loading (加载) –&gt; Wrapping (私有化) –&gt; Evaluation (执行) –&gt; Caching (缓存)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>ES Modules</li>
+</ol>
+<p>在 ESM 中，import 语句用于在解析代码时导入模块依赖的静态链接。文件的依赖关系在编译阶段就确定了。对于 ESM，模块的加载大致分为三步：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Construction (解析) -&gt; Instantiation (实例化、建立链接) -&gt; Evaluation (执行)</span><br></pre></td></tr></table></figure>
+<p>这些步骤是异步执行的，每一步都可以看作是相互独立的。这一点跟 CommonJS 有很大不同，对于 CommonJS 来说，每一步都是同步进行的。</p>
+<h3 id="两种模块间的相互引用"><a href="#两种模块间的相互引用" class="headerlink" title="两种模块间的相互引用"></a>两种模块间的相互引用</h3><p>CommonJS 和 ES Modules 都支持 <code>Dynamic import()</code>。它可以支持两种模块机制的导入：</p>
+<h4 id="在-CommonJS-文件中导入-ES-Modules-模块"><a href="#在-CommonJS-文件中导入-ES-Modules-模块" class="headerlink" title="在 CommonJS 文件中导入 ES Modules 模块"></a>在 CommonJS 文件中导入 ES Modules 模块</h4><p>由于 ES Modules 的加载、解析和执行都是异步的，而 require() 的过程是同步的、所以不能通过 require() 来引用一个 ES6 模块。ES6 提议的 import() 函数将会返回一个 Promise，它在 ES Modules 加载后标记完成。借助于此，我们可以在 CommonJS 中使用异步的方式导入 ES Modules：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 then() 来进行模块导入后的操作</span></span><br><span class="line"><span class="keyword">import</span>(<span class="string">&quot;es6-modules.mjs&quot;</span>).<span class="title function_">then</span>(<span class="function">(<span class="params"><span class="variable language_">module</span></span>)=&gt;</span>&#123;<span class="comment">/*…*/</span>&#125;).<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>)=&gt;</span>&#123;<span class="comment">/**…*/</span>&#125;)</span><br><span class="line"><span class="comment">// 或者使用 async 函数</span></span><br><span class="line">(<span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="keyword">import</span>(<span class="string">&#x27;./es6-modules.mjs&#x27;</span>);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<h3 id="在-ES-Modules-文件中导入-CommonJS-模块"><a href="#在-ES-Modules-文件中导入-CommonJS-模块" class="headerlink" title="在 ES Modules 文件中导入 CommonJS 模块"></a>在 ES Modules 文件中导入 CommonJS 模块</h3><p>在 ES6 模块里可以很方便地使用 import 来引用一个 CommonJS 模块，因为在 ES6 模块里异步加载并非是必须的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="keyword">default</span> <span class="keyword">as</span> cjs &#125; <span class="keyword">from</span> <span class="string">&#x27;cjs&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// The following import statement is &quot;syntax sugar&quot; (equivalent but sweeter)</span></span><br><span class="line"><span class="comment">// for `&#123; default as cjsSugar &#125;` in the above import statement:</span></span><br><span class="line"><span class="keyword">import</span> cjsSugar <span class="keyword">from</span> <span class="string">&#x27;cjs&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(cjs);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(cjs === cjsSugar);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Node-中-ES-Modules-的现状和未来"><a href="#Node-中-ES-Modules-的现状和未来" class="headerlink" title="Node 中 ES Modules 的现状和未来"></a>Node 中 ES Modules 的现状和未来</h2><p>在引入 ES6 标准之前，服务器端 JavaScript 代码都是依赖 CommonJS 模块机制进行包管理的。<br>如今，随着 ES Modules 的引入，开发人员可以享受到与发布规范相关的许多好处。但需要注意的是，截止至当前时间(2020.11.30)，在最新版 Node v15.1.0 中，该特性依然是实验性的（Stability: 1），不建议在生产环境中使用该功能。</p>
+<p>最后，由于两种模块格式之间存在不兼容问题，将当前项目从 CommonJS 到 ES Modules 转换将是一个很大的挑战。可以借助 Babel 相关插件实现 CommonJS 和 ES Modules 间的相互转换：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://babel.docschina.org/docs/en/babel-plugin-transform-modules-commonjs">plugin-transform-modules-commonjs</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/babel-plugin-transform-commonjs">babel-plugin-transform-commonjs</a></li>
+</ul>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><h3 id="翻译原文"><a href="#翻译原文" class="headerlink" title="翻译原文"></a>翻译原文</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.logrocket.com/es-modules-in-node-today/">es-modules-in-node-today</a></li>
+<li><a target="_blank" rel="noopener" href="https://aotu.io/notes/2017/04/22/an-update-on-es6-modules-in-node-js/index.html">an-update-on-es6-modules-in-node-js</a></li>
+</ul>
+<h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://nodejs.org/dist/latest-v14.x/docs/api/modules.html">Node Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V13.md#13.4.0">Node version13+ release log</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V14.md#14.15.0">Node version14+ release log</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nodejs/ecmascript-modules/blob/modules-lkgr/doc/api/modules.md#the-module-wrapper">Node modules wrapper</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js#L195">Node Source code: cjs</a></li>
+<li><a target="_blank" rel="noopener" href="https://tc39.es/ecma262/#sec-modules">ECMA262 Modules</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tc39/proposal-dynamic-import">TC39 Proposal Dynamic import</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NodeJS/" rel="tag"># NodeJS</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/23/%E3%80%90%E8%AF%91%E3%80%91%E4%BB%8E-ES2016-%E5%88%B0-ES2020-%E7%9A%84%E6%89%80%E6%9C%89%E7%89%B9%E6%80%A7/" rel="prev" title="【译】从 ES2016 到 ES2020 的所有特性">
+      <i class="fa fa-chevron-left"></i> 【译】从 ES2016 到 ES2020 的所有特性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/31/2020%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="next" title="2020年终总结">
+      2020年终总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-%E5%AF%B9-ES-Modules-%E6%94%AF%E6%8C%81"><span class="nav-text">Node 对 ES Modules 支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8-NodeJS-%E4%B8%AD%E4%BD%BF%E7%94%A8-ES-Modules"><span class="nav-text">在 NodeJS 中使用 ES Modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="nav-text">模块作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E7%9A%84%E5%85%A5%E5%8F%A3"><span class="nav-text">包的入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E6%A8%A1%E5%9D%97%E6%9C%BA%E5%88%B6%E5%9C%A8%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA%E4%B8%8A%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">两个模块机制在执行时机上的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E6%A8%A1%E5%9D%97%E5%9C%A8%E5%8E%9F%E7%90%86%E4%B8%8A%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">两个模块在原理上的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E7%A7%8D%E6%A8%A1%E5%9D%97%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E5%BC%95%E7%94%A8"><span class="nav-text">两种模块间的相互引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8-CommonJS-%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AF%BC%E5%85%A5-ES-Modules-%E6%A8%A1%E5%9D%97"><span class="nav-text">在 CommonJS 文件中导入 ES Modules 模块</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8-ES-Modules-%E6%96%87%E4%BB%B6%E4%B8%AD%E5%AF%BC%E5%85%A5-CommonJS-%E6%A8%A1%E5%9D%97"><span class="nav-text">在 ES Modules 文件中导入 CommonJS 模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-%E4%B8%AD-ES-Modules-%E7%9A%84%E7%8E%B0%E7%8A%B6%E5%92%8C%E6%9C%AA%E6%9D%A5"><span class="nav-text">Node 中 ES Modules 的现状和未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-text">参考链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91%E5%8E%9F%E6%96%87"><span class="nav-text">翻译原文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-text">官方文档</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一个 vscode 插件开发记录，主要是用来满足自己阅读字幕文本的需要。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vscode-subtitle-reader 插件开发">
+<meta property="og:url" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="一个 vscode 插件开发记录，主要是用来满足自己阅读字幕文本的需要。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/extension%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/UIdesign.png">
+<meta property="og:image" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/marketplace.png">
+<meta property="og:image" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/extension-page.png">
+<meta property="article:published_time" content="2024-11-16T15:30:46.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.682Z">
+<meta property="article:author" content="Kuro-P">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/extension%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+
+<link rel="canonical" href="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>vscode-subtitle-reader 插件开发 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vscode-subtitle-reader 插件开发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-11-16 23:30:46 23:30:46" itemprop="dateCreated datePublished" datetime="2024-11-16T23:30:46+08:00">2024-11-16 23:30:46</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>一个 vscode 插件开发记录，主要是用来满足自己阅读字幕文本的需要。</p>
+<span id="more"></span>
+
+<h3 id="一、想法诞生"><a href="#一、想法诞生" class="headerlink" title="一、想法诞生"></a>一、想法诞生</h3><p>习惯性收集影视剧字幕，模仿剧中角色说话的语气和神态，戏瘾大发的时候常有，于是阅读字幕文件也成了日常。</p>
+<p>最开始用 Mac 自带文稿读，无字距行距无排版，看的眼睛生疼。</p>
+<p>后来找到 Aegisub，编辑功能足够强大，既能更改字幕样式也能载入音频进行校准…</p>
+<p>再后了解到 Pr 、剪映等剪辑软件也是可以自动导入、导出、预览字幕文件，但电脑风扇也同时飞起…</p>
+<p>折腾一圈之后，觉得还不如直接用 vscode 打开字幕文本，像 markdown 文件预览那样在侧边也整一个预览面板。</p>
+<p>之后就，撸起袖子干活。</p>
+<h3 id="二、基础功能"><a href="#二、基础功能" class="headerlink" title="二、基础功能"></a>二、基础功能</h3><ul>
+<li>字幕文件 <code>.ass</code>、<code>.ssa</code>、<code>.srt</code> 语法高亮</li>
+<li>字幕文件阅读面板<ul>
+<li>面板内容同步滚动</li>
+<li>面板内容同步更新</li>
+<li>面板内容样式</li>
+<li>主语言样式切换（双语字幕）</li>
+</ul>
+</li>
+<li>定制化图标<ul>
+<li>字幕文件图标</li>
+<li>功能按钮图标</li>
+<li>插件logo</li>
+</ul>
+</li>
+</ul>
+<h4 id="自定义配置"><a href="#自定义配置" class="headerlink" title="自定义配置"></a>自定义配置</h4><table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>subtitleReader.autoOpen</strong></td>
+<td>字幕文件打开时，是否自动打开阅读面板</td>
+<td>true</td>
+</tr>
+<tr>
+<td><strong>subtitleReader.autoClose</strong></td>
+<td>字幕文件打开时，是否自动关闭阅读面板</td>
+<td>false</td>
+</tr>
+<tr>
+<td><strong>subtitleReader.showDialogueLineNumber</strong></td>
+<td>是否展示行数</td>
+<td>true</td>
+</tr>
+<tr>
+<td><strong>subtitleReader.style</strong></td>
+<td>自定义样式</td>
+<td>{}</td>
+</tr>
+</tbody></table>
+<p>默认用户打开字幕类型文件时，自动打开阅读面板，并展示字幕行数。</p>
+<h3 id="三、着手开发"><a href="#三、着手开发" class="headerlink" title="三、着手开发"></a>三、着手开发</h3><h4 id="1-数据传递"><a href="#1-数据传递" class="headerlink" title="1. 数据传递"></a>1. 数据传递</h4><img src="/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/extension%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E5%9B%BE.png" class="">
+
+<p>代码主要分为 extension 和 webview 两部分：</p>
+<ul>
+<li>extension 可以看为一个 node 应用，负责命令注册、生成页面内容。</li>
+<li>webview 则是网页是容器，用来完成页面显示和面板交互。</li>
+</ul>
+<p>二者通过调用 vscode.postMessage 接口传递数据信息，除此以外，其余部分（编译、开发）都是相对独立的。</p>
+<h4 id="2-热更新、编译打包"><a href="#2-热更新、编译打包" class="headerlink" title="2. 热更新、编译打包"></a>2. 热更新、编译打包</h4><p>vscode 官方提供的命令行工具 vsce 可将项目代码打包成 <code>.vsix</code> 文件，也是发布到 marketplace 的最终产物。<br><code>package.json</code> 中 main 的属性用于设置插件入口文件路径，发布和安装时都会校验以确认插件的可用性。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// package.json</span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  &quot;main&quot;: &quot;./dist/extension.js&quot;,</span><br><span class="line">  &quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;build-extension&quot;: &quot;NODE_ENV=production webpack --config ./build/webpack.extension.js&quot;,</span><br><span class="line">    &quot;build-panel&quot;: &quot;NODE_ENV=production webpack --config ./build/webpack.panel.js&quot;,</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>两部分编译，extension 打包应用相关代码，webview 打包相关静态文件，最终都输出到 <code>/dist</code> 路径下。</p>
+<h5 id="extension-编译"><a href="#extension-编译" class="headerlink" title="extension 编译"></a>extension 编译</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extension.ts <span class="comment"># 扩展打包入口文件，所需功能接口 &amp; 命令注册</span></span><br></pre></td></tr></table></figure>
+<p>dev: 开发模式下会自动打开新的 vscode 调试窗口和测试文件，不支持热更新；<br>prod: webpack 将以上文件打包到输出路径；</p>
+<h5 id="webview-编译"><a href="#webview-编译" class="headerlink" title="webview 编译"></a>webview 编译</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main.scss</span><br><span class="line">main.ts</span><br><span class="line">index.html <span class="comment"># 模板文件：不参与编译，需要打包到最终产物里，供 extension 渲染调用</span></span><br></pre></td></tr></table></figure>
+<p>dev: <code>index.html</code>中的 js、css 路径是动态渲染的。若为开发模式，则会访问本地 dev server 的端口，以支持热更新；<br>prod: webpack 将以上三个静态文件打包到输出路径；</p>
+<p>需要注意的是，若想要在 webview 中加载本地资源，需要将资源文件夹的 uri 提前使用 <code>localResourceRoots</code> 注册，如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> webviewPanel = vscode.<span class="property">window</span>.<span class="title function_">createWebviewPanel</span>(&#123;</span><br><span class="line">  <span class="attr">localResourceRoots</span>: [ your assets uri ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-UI-绘制"><a href="#3-UI-绘制" class="headerlink" title="3. UI 绘制"></a>3. UI 绘制</h4><p>功能快速开发时，先随便写了一套方便测试，写完自己还觉得挺好，今年回头一看啥也不是（<a target="_blank" rel="noopener" href="https://github.com/Kuro-P/vscode-subtitle-reader/blob/791a1a4262d02ba4ddeaa1ced9d19ff723c0279b/images/extension-screenshot.png">点我查看</a>）…</p>
+<p>于是趁着那点为组内分享会筹备的知识还没完全忘记。以紫色为基调，重新绘制了一套。</p>
+<img src="/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/UIdesign.png" class="">
+
+<h4 id="4-明暗主题切换"><a href="#4-明暗主题切换" class="headerlink" title="4. 明暗主题切换"></a>4. 明暗主题切换</h4><p>vscode 会在 webview 的 body 元素上注入 <code>data-vscode-theme-kind</code> 属性，用来标明用户当前使用的明暗主题，例如暗色主题值为 <code>vscode-dark</code>，webview 的 css 就会根据 body 元素此属性的值赋予元素对应的主题颜色。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@mixin</span> if-dark &#123;</span><br><span class="line">  <span class="keyword">@at-root</span> &#123;</span><br><span class="line">    <span class="selector-tag">body</span><span class="selector-attr">[data-vscode-theme-kind=<span class="string">&quot;vscode-dark&quot;</span>]</span> &amp; &#123;</span><br><span class="line">      <span class="keyword">@content</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-tag">body</span><span class="selector-attr">[data-vscode-theme-kind=<span class="string">&quot;vscode-high-contrast&quot;</span>]</span> &amp; &#123;</span><br><span class="line">      <span class="keyword">@content</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@mixin</span> <span class="attribute">color</span>(<span class="variable">$dark-color</span>, <span class="variable">$color</span>) &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="variable">$color</span>;</span><br><span class="line">  <span class="keyword">@include</span> if-dark &#123;</span><br><span class="line">    <span class="attribute">color</span>: <span class="variable">$dark-color</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、发布准备"><a href="#四、发布准备" class="headerlink" title="四、发布准备"></a>四、发布准备</h3><ul>
+<li>打包 extension ( vsce package)</li>
+<li>优化包体积<ul>
+<li>压缩图片</li>
+<li>生产环境不需要的文件移除（添加至 .vscodeignore 以避免打包）</li>
+</ul>
+</li>
+<li>本地测试<ul>
+<li>在本地 vscode 中安装打包好的测试包（需要更改 package.json 的版本，避免 vscode 使用旧包）</li>
+</ul>
+</li>
+<li>发布<ul>
+<li>通过 marketplace UI 界面手动上传 .vsix 文件</li>
+<li>或者通过本地命令行中使用 vsce publish 发布</li>
+</ul>
+</li>
+</ul>
+<img src="/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/marketplace.png" class="">
+
+<img src="/2024/11/16/vscode-subtitle-reader%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91/extension-page.png" class="" title="extension page">
+
+<h3 id="五、开发日志"><a href="#五、开发日志" class="headerlink" title="五、开发日志"></a>五、开发日志</h3><ul>
+<li>2023.5.5 看文档，完成 srt、ass 文件语法高亮（参照 vscode-subtitles）</li>
+<li>2023.5.19 预览面板可以根据打开的文件自动打开，但是打开多个文件时 webview 显示有些问题</li>
+<li>2023.6.7 内容更新已经写完，截止至此，插件的基本功能几乎都有了。本想参照 markdown-all-in-one 做同步滚动，但是 markdown 是滚动同步是双向的。目前只完成了单向同步，留给下次优化了</li>
+<li>2024.4.30 优化编译脚本，实现 webviewPanel 开发时的热更新</li>
+<li>2024.5.7 基础功能都已开发完毕，编译命令也调试好了，之后等有空发到 vscode 社区里就可以用了</li>
+<li>2024.9.16 重新绘制样式和插件图标，统一 UI 风格</li>
+<li>2024.10.17 发布到 marketplace</li>
+<li>2024.11.6 添加自动发布 CI</li>
+</ul>
+<h3 id="六、一些心情"><a href="#六、一些心情" class="headerlink" title="六、一些心情"></a>六、一些心情</h3><p>功能实现并不难，重要的是取舍。不必要的想法太多只会耽误时间和进度。<br>开始和收尾工作同样重要，否则半途而废有头没尾也只是一个再次被抛弃的想法而已。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/28/libpag%E5%88%9D%E4%BD%BF%E7%94%A8-render-pag%E7%9A%84%E8%AF%9E%E7%94%9F/" rel="prev" title="PAG 移动端动效方案">
+      <i class="fa fa-chevron-left"></i> PAG 移动端动效方案
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/30/2024%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="next" title="2024年终总结">
+      2024年终总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%83%B3%E6%B3%95%E8%AF%9E%E7%94%9F"><span class="nav-text">一、想法诞生</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD"><span class="nav-text">二、基础功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE"><span class="nav-text">自定义配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%9D%80%E6%89%8B%E5%BC%80%E5%8F%91"><span class="nav-text">三、着手开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E4%BC%A0%E9%80%92"><span class="nav-text">1. 数据传递</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E7%83%AD%E6%9B%B4%E6%96%B0%E3%80%81%E7%BC%96%E8%AF%91%E6%89%93%E5%8C%85"><span class="nav-text">2. 热更新、编译打包</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#extension-%E7%BC%96%E8%AF%91"><span class="nav-text">extension 编译</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#webview-%E7%BC%96%E8%AF%91"><span class="nav-text">webview 编译</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-UI-%E7%BB%98%E5%88%B6"><span class="nav-text">3. UI 绘制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%98%8E%E6%9A%97%E4%B8%BB%E9%A2%98%E5%88%87%E6%8D%A2"><span class="nav-text">4. 明暗主题切换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%8F%91%E5%B8%83%E5%87%86%E5%A4%87"><span class="nav-text">四、发布准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97"><span class="nav-text">五、开发日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E4%B8%80%E4%BA%9B%E5%BF%83%E6%83%85"><span class="nav-text">六、一些心情</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

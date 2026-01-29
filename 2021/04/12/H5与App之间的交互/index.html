@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="遗留了很久的一个学习任务，最近正好在总结归纳小程序在 App 之间的交互，顺便拾起一些学过的和没学过的知识。主要涉及的知识点：URL Scheme、Webview、H5 与 App 之间的通信以及 JSBridge 的概念。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="H5 与 App 之间的交互">
+<meta property="og:url" content="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="遗留了很久的一个学习任务，最近正好在总结归纳小程序在 App 之间的交互，顺便拾起一些学过的和没学过的知识。主要涉及的知识点：URL Scheme、Webview、H5 与 App 之间的通信以及 JSBridge 的概念。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/IOS.png">
+<meta property="og:image" content="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/Android.png">
+<meta property="article:published_time" content="2021-04-12T08:10:08.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.679Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="App">
+<meta property="article:tag" content="Webview">
+<meta property="article:tag" content="交互">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/IOS.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>H5 与 App 之间的交互 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          H5 与 App 之间的交互
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-12 16:10:08 16:10:08" itemprop="dateCreated datePublished" datetime="2021-04-12T16:10:08+08:00">2021-04-12 16:10:08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>遗留了很久的一个学习任务，最近正好在总结归纳小程序在 App 之间的交互，顺便拾起一些学过的和没学过的知识。主要涉及的知识点：URL Scheme、Webview、H5 与 App 之间的通信以及 JSBridge 的概念。</p>
+<span id="more"></span>
+
+<h3 id="一、H5-与-App-之间的通信"><a href="#一、H5-与-App-之间的通信" class="headerlink" title="一、H5 与 App 之间的通信"></a>一、H5 与 App 之间的通信</h3><h4 id="1-JS-Bridge"><a href="#1-JS-Bridge" class="headerlink" title="1. JS Bridge"></a>1. JS Bridge</h4><p>Webview 是原生 App 的组件，它可以向当前网页内容 <strong>添加和执行 JS</strong> ，使页面和 App 互相通过 JS 进行数据传递、函数调用。 </p>
+<p><em>注：以下示例均为 Android 代码</em></p>
+<p><strong>App 调用 JS 代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方法一：直接调用 JS 函数</span></span><br><span class="line">webView.loadUrl(<span class="string">&quot;javascript:jsFunction(&#x27;&quot;</span> + arg + <span class="string">&quot;&#x27;)&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法二：直接执行 JS 代码</span></span><br><span class="line">webView.evaluateJavascript(</span><br><span class="line">    <span class="string">&quot;(console,log(&#x27;test from app&#x27;); &#125;)();&quot;</span>,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p><strong>JS 调用 App 代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将方法名注册到 window 对象上</span></span><br><span class="line">webView.addJavascriptInterface(<span class="keyword">new</span> <span class="title class_">JsBridge</span>(), <span class="string">&quot;AppFunction&quot;</span>);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AppFunction</span> &#123;</span><br><span class="line">    <span class="meta">@JavascriptInterface</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span> &#123;</span><br><span class="line">        ....</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JS 调用</span></span><br><span class="line"><span class="variable language_">window</span>.<span class="property">AppFunction</span>.<span class="title function_">doSomething</span>()</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-URL-Scheme"><a href="#2-URL-Scheme" class="headerlink" title="2. URL Scheme"></a>2. URL Scheme</h4><p><strong>JS 调用 App 代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 拦截 URL Scheme</span></span><br><span class="line">webView.setWebViewClient(<span class="keyword">new</span> <span class="title class_">WebViewClient</span>() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">shouldOverrideUrlLoading</span><span class="params">(WebView view, String url)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (url.startsWith(<span class="string">&quot;scheme://&quot;</span>)) &#123;</span><br><span class="line">            <span class="comment">// do something</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JS 调用</span></span><br><span class="line">location.<span class="property">href</span> = <span class="string">&#x27;scheme://doSomething?param1=xxx&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，还有一种链接：<strong>Universal Link (通用链接)</strong> ， 是 Apple 在 iOS9 推出的一种能够通过 HTTPS 链接来启动 APP 的功能。当应用支持此链接时，则会无缝跳转到 APP，而不需要其他判断；若用户未安装当前 App，则会使用浏览器直接打开此网页。</p>
+<h3 id="二、H5-唤起-App"><a href="#二、H5-唤起-App" class="headerlink" title="二、H5 唤起 App"></a>二、H5 唤起 App</h3><p>大致流程如下：</p>
+<div class="custom-flow-chart">
+<style>
+  .custom-flow-chart svg {
+    display: block;
+    margin: 0 auto;
+  }
+</style> 
+<div id="flowchart-0" class="flow-chart"></div>
+</div>
+
+<h4 id="若在小程序的-Webview-中尝试唤起-App-会怎么样？"><a href="#若在小程序的-Webview-中尝试唤起-App-会怎么样？" class="headerlink" title="若在小程序的 Webview 中尝试唤起 App 会怎么样？"></a>若在小程序的 Webview 中尝试唤起 App 会怎么样？</h4><p>由于微信拦截了 URL Scheme，所以并不会打开 App。<br>介时小程序底层就会判断 Webview 环境，跳转对应的应用商店。<br><strong>在 Mac 上的开发者工具中会跳转 App Store</strong></p>
+<img src="/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/IOS.png" class="" width="400">
+
+<p><strong>在安卓手机的微信小程序中则会跳转（腾讯的安装渠道）</strong></p>
+<img src="/2021/04/12/H5%E4%B8%8EApp%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BA%A4%E4%BA%92/Android.png" class="" width="400">
+
+<p>由于上述两个示例的域名都没有在微信后台配置，故会被微信认为是不可信的域名，跳转到一个空白页面，提示域名不可信。</p>
+<p><em>注：主要禁止的原因是，小程序不允许将流量导出到 APP 之外。</em></p>
+<h3 id="联调注意事项"><a href="#联调注意事项" class="headerlink" title="联调注意事项"></a>联调注意事项</h3><ol>
+<li>同一方法，若确定方法名、参数等没有问题，但是调用结果与预期不一致，注意同时对比 IOS 端和 Android 端表现是否一致，若表现不一致，则应找对应的客户端同事去修改；</li>
+<li>注意测试 App 版本号，以及 H5 中引用的 sdk 版本号，排查问题时考虑是否是版本过旧导致的；</li>
+<li>对于用作工具的测试页面出现问题，即时反馈，有可能是测试页面未更新。</li>
+</ol>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/carson_ho/article/details/64904691">Android：你要的WebView与 JS 交互方式 都在这里了</a></li>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000016759517">h5 与原生 app 交互的原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://alibaba-cloud.medium.com/in-depth-profiling-of-jsbridge-63dc797f8c77">In-depth Profiling of JSBridge</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/reference/android/os/Build.VERSION">Android Build Version</a><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=>start: 调用唤起 App 的方法
+op1=>operation: 页面打开与 App 约定好的 URL
+op2=>operation: 用定时器监听 visibilityChange 事件
+c1=>condition: 页面是否隐藏
+op3=>operation: 调起失败
+op4=>operation: 判断当前 webview 平台
+op5=>operation: 跳转到对应渠道下载页面
+op6=>operation: 调起成功
+e=>end: 页面的其他逻辑操作
+
+st->op1->op2->c1
+c1(no)->op3->op4->op5
+c1(yes)->op6->e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/App/" rel="tag"># App</a>
+              <a href="/tags/Webview/" rel="tag"># Webview</a>
+              <a href="/tags/%E4%BA%A4%E4%BA%92/" rel="tag"># 交互</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/22/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E4%BB%8E0%E5%88%B01/" rel="prev" title="微信小程序从 0 到 1">
+      <i class="fa fa-chevron-left"></i> 微信小程序从 0 到 1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/09/14/%E3%80%8A%E5%86%99%E7%BB%99%E5%A4%A7%E5%AE%B6%E7%9C%8B%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B9%A6%E3%80%8B-%E5%B0%8F%E7%BB%93/" rel="next" title="《写给大家看的设计书》- 小结">
+      《写给大家看的设计书》- 小结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81H5-%E4%B8%8E-App-%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-text">一、H5 与 App 之间的通信</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-JS-Bridge"><span class="nav-text">1. JS Bridge</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-URL-Scheme"><span class="nav-text">2. URL Scheme</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81H5-%E5%94%A4%E8%B5%B7-App"><span class="nav-text">二、H5 唤起 App</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8B%A5%E5%9C%A8%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%9A%84-Webview-%E4%B8%AD%E5%B0%9D%E8%AF%95%E5%94%A4%E8%B5%B7-App-%E4%BC%9A%E6%80%8E%E4%B9%88%E6%A0%B7%EF%BC%9F"><span class="nav-text">若在小程序的 Webview 中尝试唤起 App 会怎么样？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%94%E8%B0%83%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">联调注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

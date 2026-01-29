@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":24,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="有两个场景，一是希望单个项目能兼容不同尺寸设计稿；二是想要移动端页面在 PC&#x2F;iPad 等横屏设备也能比较好的展示，而并非纯粹的等比例放大。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="postcss-px-to-unit 插件开发：多端适配兼容">
+<meta property="og:url" content="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/index.html">
+<meta property="og:site_name" content="Daily record">
+<meta property="og:description" content="有两个场景，一是希望单个项目能兼容不同尺寸设计稿；二是想要移动端页面在 PC&#x2F;iPad 等横屏设备也能比较好的展示，而并非纯粹的等比例放大。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/pagescreen.png">
+<meta property="og:image" content="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/fullscreen.png">
+<meta property="og:image" content="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/fullscreen-landscape.png">
+<meta property="article:published_time" content="2025-04-08T19:29:25.000Z">
+<meta property="article:modified_time" content="2026-01-29T02:13:02.682Z">
+<meta property="article:author" content="Kuro-P">
+<meta property="article:tag" content="CSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/pagescreen.png">
+
+<link rel="canonical" href="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>postcss-px-to-unit 插件开发：多端适配兼容 | Daily record</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Daily record</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">琐记随笔</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-bookmark fa-fw"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-movies">
+
+    <a href="/movies/" rel="section"><i class="fa fa-film fa-fw"></i>电影</a>
+
+  </li>
+        <li class="menu-item menu-item-games">
+
+    <a href="/games/" rel="section"><i class="fa fa-gamepad fa-fw"></i>游戏</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Kuro-P">
+      <meta itemprop="description" content="FE and more ...">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Daily record">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          postcss-px-to-unit 插件开发：多端适配兼容
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-04-09 03:29:25 03:29:25" itemprop="dateCreated datePublished" datetime="2025-04-09T03:29:25+08:00">2025-04-09 03:29:25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-01-29 10:13:02 10:13:02" itemprop="dateModified" datetime="2026-01-29T10:13:02+08:00">2026-01-29 10:13:02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/CSS/" itemprop="url" rel="index"><span itemprop="name">CSS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>有两个场景，一是希望单个项目能兼容不同尺寸设计稿；二是想要移动端页面在 PC&#x2F;iPad 等横屏设备也能比较好的展示，而并非纯粹的等比例放大。</p>
+<span id="more"></span>
+<h3 id="一、兼容不同尺寸设计稿"><a href="#一、兼容不同尺寸设计稿" class="headerlink" title="一、兼容不同尺寸设计稿"></a>一、兼容不同尺寸设计稿</h3><p>目前通用设计稿画布宽度为 375，也是最常见的适配宽度。偶尔比较新的项目或者活动会有 414 底稿，罕见点会有 393。独立项目独立 config，更改适配项即可。直至 <strong>同一个项目收到了两个尺寸的设计稿</strong> ，一个 375，一个 393…</p>
+<p>由于设计师侧暂无暇重新调整为统一尺寸，只能从适配层面考虑，兼容两种尺寸。</p>
+<p>项目使用 <code>postcss-px-to-viewport</code> 插件进行适配，默认适配 375。现为部分页面路径单独设置适配尺寸。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">loader</span>: <span class="string">&#x27;postcss-loader&#x27;</span>,</span><br><span class="line">  <span class="attr">options</span>: &#123;</span><br><span class="line">    <span class="attr">postcssOptions</span>: <span class="function">(<span class="params">loaderContext</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> _viewportConfig = &#123;</span><br><span class="line">        <span class="attr">unitToConvert</span>: <span class="string">&#x27;px&#x27;</span>, </span><br><span class="line">        <span class="attr">viewportWidth</span>: <span class="number">375</span>,</span><br><span class="line">        <span class="attr">unitPrecision</span>: <span class="number">5</span>,</span><br><span class="line">        <span class="attr">propList</span>: [ <span class="string">&#x27;*&#x27;</span>, <span class="string">&#x27;!font-size&#x27;</span> ],</span><br><span class="line">        ...</span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 为 pages_need_393 路径下的页面设置特殊的适配尺寸</span></span><br><span class="line">      <span class="keyword">if</span> (loaderContext.<span class="property">resourcePath</span>.<span class="title function_">includes</span>(<span class="string">&#x27;pages_need_393&#x27;</span>)) &#123;</span><br><span class="line">        _viewportConfig.<span class="property">viewportWidth</span> = <span class="number">393</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="attr">plugins</span>: [</span><br><span class="line">          <span class="title function_">px2viewport</span>(_viewportConfig),</span><br><span class="line">          <span class="string">&#x27;autoprefixer&#x27;</span>,</span><br><span class="line">          <span class="string">&#x27;postcss-preset-env&#x27;</span></span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+<h3 id="二、多设备及横屏适配"><a href="#二、多设备及横屏适配" class="headerlink" title="二、多设备及横屏适配"></a>二、多设备及横屏适配</h3><h4 id="期望效果"><a href="#期望效果" class="headerlink" title="期望效果"></a>期望效果</h4><img src="/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/pagescreen.png" class="">
+
+<h4 id="postcss-px-to-viewport"><a href="#postcss-px-to-viewport" class="headerlink" title="postcss-px-to-viewport"></a>postcss-px-to-viewport</h4><p><strong>未设置 landscape 表现</strong></p>
+<img src="/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/fullscreen.png" class="">
+
+<p><strong>设置 landscape 后，表现不如预期</strong><br>按照官方文档设置 landscape 横屏数值后，iPad 全屏可以展示，PC 端展示比例过大（感觉 px2viewport 的横&#x2F;竖屏模式是按照移动设备进行适配的，PC 端并不在此种情况之内）</p>
+<img src="/2025/04/09/px-to-unit-%E5%A4%9A%E7%AB%AF%E9%80%82%E9%85%8D%E5%85%BC%E5%AE%B9/fullscreen-landscape.png" class="">
+
+<h3 id="三、解决方式"><a href="#三、解决方式" class="headerlink" title="三、解决方式"></a>三、解决方式</h3><p>想达到预期效果，最简单的方式就是固定页面方向（portrait），对iPad&#x2F;PC等宽屏设备不做适配，使用原像素值。<br>扫了眼 <code>postcss-px-to-viewport</code> 的源码，它的计算方式如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">createPxReplace</span>(<span class="params">opts, viewportUnit, viewportSize</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">m, $1</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!$1) <span class="keyword">return</span> m;</span><br><span class="line">    <span class="keyword">var</span> pixels = <span class="built_in">parseFloat</span>($1);</span><br><span class="line">    <span class="keyword">if</span> (pixels &lt;= opts.<span class="property">minPixelValue</span>) <span class="keyword">return</span> m;</span><br><span class="line">    <span class="comment">// 计算当前值在视口中的占比</span></span><br><span class="line">    <span class="keyword">var</span> parsedVal = <span class="title function_">toFixed</span>((pixels / viewportSize * <span class="number">100</span>), opts.<span class="property">unitPrecision</span>);</span><br><span class="line">    <span class="keyword">return</span> parsedVal === <span class="number">0</span> ? <span class="string">&#x27;0&#x27;</span> : parsedVal + viewportUnit;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">landscapeRule.<span class="title function_">append</span>(decl.<span class="title function_">clone</span>(&#123;</span><br><span class="line">  <span class="attr">value</span>: decl.<span class="property">value</span>.<span class="title function_">replace</span>(pxRegex, <span class="title function_">createPxReplace</span>(opts, opts.<span class="property">landscapeUnit</span>, opts.<span class="property">landscapeWidth</span>))</span><br><span class="line">&#125;));</span><br></pre></td></tr></table></figure>
+<p>故将插件的 landscapeWidth 设置为 100, landscapeUnit 设置为 px 即可抵消转换。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* postcss-px-to-viewport config */</span></span><br><span class="line">&#123; </span><br><span class="line"> ...</span><br><span class="line">  <span class="attr">landscape</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">landscapeUnit</span>: <span class="string">&#x27;px&#x27;</span>, </span><br><span class="line">  <span class="attr">landscapeWidth</span>: <span class="number">100</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、更进一步，动手重写"><a href="#四、更进一步，动手重写" class="headerlink" title="四、更进一步，动手重写"></a>四、更进一步，动手重写</h3><p>在 webpack 中使用 postcss-loader 对 css 文件进行处理。此插件可以获得 webpack 在处理 css 时的每一步、以及在 AST 语法树生成的过程中做一些操作，例如替换 px。<br>插件的回调会告知处理 CSS 的每一步，届时可替换原始值为转换后的数值&#x2F;单位。</p>
+<h4 id="postcss-px-to-unit"><a href="#postcss-px-to-unit" class="headerlink" title="postcss-px-to-unit"></a>postcss-px-to-unit</h4><p>使用 CSS 变量 + 媒体查询 实现灵活适配，视口宽度交由 CSS 设置，而不是在编译阶段设置：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* postcss-px-to-unit.js */</span></span><br><span class="line"><span class="keyword">const</span> postcss = <span class="built_in">require</span>(<span class="string">&#x27;postcss&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = postcss.<span class="title function_">plugin</span>(<span class="string">&#x27;postcss-px-to-unit&#x27;</span>, <span class="keyword">function</span> (<span class="params">options</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;postcss-px-to-unit&#x27;</span>, options)</span><br><span class="line">  <span class="keyword">const</span> &#123; designWidth = <span class="number">375</span> &#125; = options || &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">css, result</span>) &#123;</span><br><span class="line">    css.<span class="title function_">walkRules</span>(<span class="keyword">function</span> (<span class="params">rule</span>) &#123;</span><br><span class="line">      rule.<span class="title function_">walkDecls</span>(<span class="keyword">function</span>(<span class="params">decl</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (rule.<span class="property">selector</span> === <span class="string">&#x27;body&#x27;</span>) &#123;</span><br><span class="line">          <span class="keyword">return</span> decl.<span class="property">value</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">const</span> regx = <span class="regexp">/(-?\d*)px/g</span></span><br><span class="line">        <span class="keyword">const</span> matchedResults = regx.<span class="title function_">exec</span>(decl.<span class="property">value</span>)</span><br><span class="line">        <span class="keyword">if</span> (matchedResults) &#123;</span><br><span class="line">          <span class="keyword">const</span> [ matchedText, $1 ] = matchedResults</span><br><span class="line">          decl.<span class="property">value</span> = decl.<span class="property">value</span>.<span class="title function_">replace</span>(matchedText, <span class="string">`calc(<span class="subst">$&#123; $1 / designWidth &#125;</span> * var(--viewportWidth))`</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* main.css */</span></span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attr">--viewportWidth</span>: <span class="number">550px</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">@media</span> screen <span class="keyword">and</span> (<span class="attribute">max-width</span>: <span class="number">728px</span>) &#123;</span><br><span class="line">    <span class="attr">--viewportWidth</span>: <span class="number">100vw</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>注: 为 body 设置 550 的视口，是因为 375 的设计稿在宽屏设备上用这个比例展示看起来更舒适。</em></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/30/2024%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="prev" title="2024年终总结">
+      <i class="fa fa-chevron-left"></i> 2024年终总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/01/13/2025%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="next" title="2025年终总结">
+      2025年终总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%85%BC%E5%AE%B9%E4%B8%8D%E5%90%8C%E5%B0%BA%E5%AF%B8%E8%AE%BE%E8%AE%A1%E7%A8%BF"><span class="nav-text">一、兼容不同尺寸设计稿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%A4%9A%E8%AE%BE%E5%A4%87%E5%8F%8A%E6%A8%AA%E5%B1%8F%E9%80%82%E9%85%8D"><span class="nav-text">二、多设备及横屏适配</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%9F%E6%9C%9B%E6%95%88%E6%9E%9C"><span class="nav-text">期望效果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#postcss-px-to-viewport"><span class="nav-text">postcss-px-to-viewport</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F"><span class="nav-text">三、解决方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%9B%B4%E8%BF%9B%E4%B8%80%E6%AD%A5%EF%BC%8C%E5%8A%A8%E6%89%8B%E9%87%8D%E5%86%99"><span class="nav-text">四、更进一步，动手重写</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#postcss-px-to-unit"><span class="nav-text">postcss-px-to-unit</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kuro-P"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Kuro-P</p>
+  <div class="site-description" itemprop="description">FE and more ...</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kuro-p" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kuro-p" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:kuro8374@foxmail.com" title="E-Mail → mailto:kuro8374@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/about/" title="About → &#x2F;about&#x2F;"><i class="fa fa-user fa-fw"></i>About</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/" style="text-decoration: none; border: none;">京ICP备20008430号-2</a>
+  <span class="with-love">
+    <i class="fa fa-marker"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kuro-P</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
