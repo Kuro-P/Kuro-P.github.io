@@ -4,56 +4,85 @@ date: 2018-11-17 14:06:50
 tags: [git]
 categories: git
 ---
-思路就是通过 SSH config 中为不同的域名指定不同的 SSH key，之后再使用 `git config -- local` 将 github repository 设置成自己的 github 用户账号。
+使用多个 git 账号和多个 ssh 连接的场景。思路是通过 SSH config 中为不同的连接指定不同的 key，通过 `git_config` 为不同的目录指定不同的 git 账号。
 
 <!--more-->
 
-### 一、生成 SSH 秘钥
-分别生成 github、gitlab 所需密钥：
+### 一、配置 SSH 秘钥
 
-* 使用 `ssh-keygen -t rsa -C "邮箱地址"` 生成两份密钥对
-* 分别命名为 `id_rsa、id_rsa.pub` 和 `github_rsa、github_rsa.pub`
+#### 1. 生成并上传秘钥对：
+* 生成密钥对：`ssh-keygen -t rsa -C "邮箱地址"`
+* 为密钥对设置名称：如公司设置为 `id_rsa`、`id_rsa.pub`，个人设置为 `github_rsa`、`github_rsa.pub`
 * 生成密钥的过程中，命令行提示输入 passphrase，用作每次进行 ssh 连接时的确认密码（电脑和账号这里都是个人使用所以直接按回车设置为空就可以）
-* 将两份公钥 `id_rsa.pub`、`github_rsa.pub` 分别上传至 gitlab、github
-* 由于 ssh 连接默认查找的都是私钥路径为 ~/.ssh/id_rsa，所以需要为 github 手动指明所需私钥 github_rsa，否则会报错 Permission denied (publickey) 
-* 在 `~/.ssh`下创建一个 config 文件，添加配置：
+* 将两份公钥 `id_rsa.pub`、`github_rsa.pub` 分别上传至公司 git 站点 和 个人 git 站点
+
+
+#### 2. 更改 ssh 配置 
+在 `~/.ssh`下创建一个 config 文件，添加配置：
+
+这里的 Host 是对应配置一个别名，自行设置，不可以重复；而 Hostname 则是站点域名或 ip 地址，可以重复。
 ````
 Host github.com
-    Hostname ssh.github.com
-    Port 443
+    Hostname github.com
+    User git
+    IdentityFile ~/.ssh/id_rsa
+
+Host personal.github.com
+    Hostname github.com
     User git
     IdentityFile ~/.ssh/github_rsa
-````
-_注意：若为 github 中配置了两个同名 ssh，那么 config 中谁在前谁生效_
 
-### 二、测试 SSH 连接
-运行`ssh -T github` 命令测试是否配置成功。
+Host blog_site_git
+    Hostname 123.12.21.321
+    User git
+    IdentityFile ~/.ssh/blog_site_git.pem
+````
+
+#### 3. 测试 SSH 连接
+运行 `ssh -T <User>@[Hostname]` 命令测试是否成功，例如 `ssh -T git@personal.github.com`
 {% asset_img "test-ssh-connect.png" %}
 如果能看到一些 Welcome 信息，说明是 OK 的。
 
-### 三、配置多个 git 用户名/邮箱
-为了使 git 知道提交的用户是谁，需要对账户名进行配置。由于全局配置是公司的账号，所以只需对自己想要进行操作的 git 库进行配置即可。
 
-#### 1. 单独配置某个 git 库
-使用 `git config` 为不同代码库单独指定用户名。
+### 二、配置 git 账号
+为了使 git 知道提交的用户是谁，需要对账户名进行配置。
 
-````
-    git config --local user.name 'username' # github账号名称
-    git config --local user.email 'username@gmail.com' # github账号邮箱
-````
+可以通过 `git config --global`、`git config --local` 来精细的指定全局/某一个仓库的账号名。
+也可以通过 `.gitconfig` 文件来对某一目录下的文件使用单独的配置。
 
-设置之后，在当前 git 库下使用 `git config --get user.name` 查看用户名是否设置成功。
-缺点是当代码库多的时候，每次都需要重新指定，有点麻烦。
-
-#### 2. 同时配置多个 git 库
-在全局配置中 `~/,gitconfig` 指定某个文件夹下所有 git 库使用的配置文件。
-```
+这里记录一下根据文件目录区分配置的方式：
+```sh
+# .gitconfig
 [user]
-	name = Kuro-P
-	email = XXXX@XXXX.com
+	name = user_name_1
+	email = user_email_1
 
-[includeIf "gitdir:~/githubProjects/"]
-	path = ~/.gitconfig_github
+[includeIf "gitdir:~/personal_projects/**"]
+	path = ~/.gitconfig_personal
+
+[includeIf "gitdir:~/work_projects/**"]
+	path = ~/.gitconfig_work
 ```
-设置之后，进入当前文件夹下任一 git 库中查看 user.name 是否生效。
-这种方式能解决大部分场景，批量操作方便。 
+
+```sh
+# .gitconfig_personal
+[user]
+	name = user_name_personal
+	email = user_email_personal
+```
+
+```sh
+# .gitconfig_work
+[user]
+	name = user_name_work
+	email = user_email_work
+```
+
+设置之后，进入配置中的文件夹执行 `git config user.name` 查看 user.name 是否生效。
+
+### 三、修改本地 git 指向的远端仓库
+在 `.ssh/config` 若有同名的 HostName，且设置了 Host 别名后，直接推代码会出现 Access Deny，大概率是因为当前推送代码的账号用的 ssh 连接错误，需要手动指定，如：
+
+```sh
+git remote set-url origin git@personal.github.com:Kuro-P/Kuro-P.github.io.git
+```
